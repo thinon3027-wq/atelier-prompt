@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Générateur de prompts pour les enseignants d'économie-droit et de vente-commerce en bac pro.">
+<title>Atelier Prompt Commerce-Vente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : établi à deux colonnes — formulaire en étapes à gauche, prompt Markdown vivant à droite (empilé sur mobile) */
+:root{
+  --bg:#EEF2F1; --surface:#FFFFFF; --sunk:#E3E9E7; --line:#C9D3D0;
+  --fg:#16211F; --muted:#56635F;
+  --accent:#0B6E5F; --accent-ink:#FFFFFF; --accent-soft:#D3EBE5;
+  --mark:#F2B632; --mark-soft:#FCEFCB;
+  --code-bg:#13201D; --code-fg:#DCE7E3; --code-h:#F2B632; --code-k:#7FD3C0; --code-dim:#8AA19A;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1715; --surface:#16211F; --sunk:#1C2926; --line:#2E3E3A;
+  --fg:#E4ECE9; --muted:#9AABA6;
+  --accent:#3FC1A8; --accent-ink:#06201A; --accent-soft:#183C35;
+  --mark:#F2B632; --mark-soft:#3A3115;
+  --code-bg:#0A110F; --code-fg:#DCE7E3; --code-h:#F2B632; --code-k:#7FD3C0; --code-dim:#71857F;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1715; --surface:#16211F; --sunk:#1C2926; --line:#2E3E3A;
+  --fg:#E4ECE9; --muted:#9AABA6;
+  --accent:#3FC1A8; --accent-ink:#06201A; --accent-soft:#183C35;
+  --mark:#F2B632; --mark-soft:#3A3115;
+  --code-bg:#0A110F; --code-fg:#DCE7E3; --code-h:#F2B632; --code-k:#7FD3C0; --code-dim:#71857F;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1380px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:8px 20px;border-bottom:2px solid var(--fg);margin-bottom:22px}
+.brand h1{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,4vw,40px);line-height:1.02;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.brand h1 span{background:linear-gradient(transparent 62%,var(--mark) 62%);padding:0 .08em}
+.brand p{margin:6px 0 0;color:var(--muted);max-width:62ch}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;border:1.5px solid var(--fg);background:var(--surface);color:var(--fg);padding:8px 14px;border-radius:999px;cursor:pointer}
+.btn:hover{background:var(--sunk)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,.chip input:focus-visible+span{outline:3px solid var(--mark);outline-offset:2px}
+
+.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:24px;align-items:start}
+@media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+fieldset.step{border:0;margin:0 0 18px;padding:18px 18px 20px;background:var(--surface);border-radius:var(--r);border:1px solid var(--line)}
+.step legend{float:left;width:100%;display:flex;align-items:baseline;gap:10px;font-family:var(--f-display);font-weight:700;font-size:19px;margin-bottom:12px;padding:0}
+.step legend b{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--accent);border:1.5px solid var(--accent);border-radius:999px;padding:1px 8px}
+.step legend + *{clear:both}
+.hint{color:var(--muted);font-size:13.5px;margin:-4px 0 12px}
+label.f{display:block;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+input[type=text],input[type=number],select,textarea{font:inherit;width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+textarea{min-height:70px;resize:vertical}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 14px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--bg);cursor:pointer;font-size:14px;user-select:none}
+.chip span:hover{border-color:var(--accent)}
+.chip input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chip.big span{padding:10px 14px;border-radius:10px;flex-direction:column;align-items:flex-start;gap:0;min-width:150px}
+.chip.big small{font-weight:400;opacity:.8;font-size:12px}
+
+details.menu{border:1.5px solid var(--line);border-radius:8px;margin:8px 0;background:var(--bg)}
+details.menu>summary{cursor:pointer;padding:10px 12px;font-weight:700;display:flex;justify-content:space-between;gap:10px;list-style:none}
+details.menu>summary::-webkit-details-marker{display:none}
+details.menu>summary::after{content:"▾";color:var(--muted);transition:transform .15s}
+details.menu[open]>summary::after{transform:rotate(180deg)}
+.tuto{padding:0 14px 12px;font-size:14px}.tuto ol{margin:4px 0 10px;padding-left:22px}.tuto p{margin:8px 0}
+details.menu>summary .count{margin-left:auto;font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:600}
+.menu-body{padding:2px 12px 12px}
+.sub{margin:10px 0 4px}
+.sub-h{display:flex;align-items:flex-start;gap:8px;font-weight:700;font-size:14px;color:var(--fg)}
+.cbl{display:flex;align-items:flex-start;gap:8px;padding:4px 0 4px 22px;font-size:14px;cursor:pointer}
+.cbl input,.sub-h input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex:none}
+.refpick{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.reftag{display:inline-block;font-family:var(--f-mono);font-size:11px;padding:1px 6px;border-radius:4px;background:var(--mark-soft);color:var(--fg);margin-right:4px}
+
+.step legend .opt{font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:22px 16px;border:2px dashed var(--line);border-radius:var(--r);background:var(--bg);cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.drop:focus-within{outline:3px solid var(--mark);outline-offset:2px}
+.drop strong{font-family:var(--f-display);font-size:17px}
+.drop span{color:var(--muted);font-size:13px}
+.reslist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.res{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg)}
+.res .ext{font-family:var(--f-mono);font-size:11px;font-weight:600;text-transform:uppercase;background:var(--fg);color:var(--bg);border-radius:4px;padding:3px 6px;min-width:42px;text-align:center}
+.res .nm{font-weight:700;overflow-wrap:anywhere}
+.res .st{grid-column:2/4;font-size:12.5px;color:var(--muted)}
+.res .st.ok{color:var(--accent)}
+.res .st.warn{color:var(--fg)}
+.res .st.warn::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mark);margin-right:6px}
+.res .ctl{grid-column:2/4;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13px}
+.res .ctl select{width:auto;padding:4px 8px;font-size:13px}
+.res .ctl label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.res .ctl input{accent-color:var(--accent)}
+.res .rm{border:0;background:none;color:var(--muted);font:inherit;font-size:20px;line-height:1;cursor:pointer;padding:2px 6px;border-radius:6px}
+.res .rm:hover{color:var(--fg);background:var(--sunk)}
+.cond[hidden]{display:none!important}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{display:flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px;cursor:pointer;background:var(--bg);font-size:13px}
+.sw i{display:flex;border-radius:999px;overflow:hidden}
+.sw i em{width:14px;height:22px;display:block}
+.sw.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.colors{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.colors label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.colors input[type=color]{width:38px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0;background:none}
+
+/* Panneau prompt */
+.out{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:980px){.out{position:static}}
+.panel{background:var(--code-bg);color:var(--code-fg);border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+.panel-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #ffffff1a}
+.panel-h h2{margin:0;font-family:var(--f-display);font-size:17px;color:#fff}
+.panel-h .meta{font-family:var(--f-mono);font-size:11.5px;color:var(--code-dim)}
+.panel pre{margin:0;padding:16px;font-family:var(--f-mono);font-size:12.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;max-height:calc(100vh - 220px);min-height:320px;overflow:auto}
+@media (max-width:980px){.panel pre{max-height:70vh}}
+.panel pre .h{color:var(--code-h);font-weight:600}
+.panel pre .k{color:var(--code-k)}
+.panel pre .d{color:var(--code-dim)}
+.panel .copy{background:var(--mark);border-color:var(--mark);color:#16211F}
+.toast{font-size:13px;color:var(--mark);min-height:1em}
+.tips{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;font-size:14px}
+.tips h3{margin:0 0 6px;font-family:var(--f-display);font-size:15px}
+.tips ol{margin:0;padding-left:20px}
+.tips li{margin:3px 0}
+footer{margin-top:30px;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="top">
+  <div class="brand">
+    <h1>Atelier <span>Prompt</span> Commerce-Vente</h1>
+    <p>Choisissez vos compétences, votre support et votre méthode : l'atelier rédige un prompt Markdown prêt à coller dans ChatGPT, Claude, Gemini, Le Chat ou toute autre IA.</p>
+  </div>
+  <div class="top-actions">
+    <button class="btn" id="btn-example" type="button">Charger l'exemple</button>
+    <button class="btn" id="btn-reset" type="button">Tout effacer</button>
+  </div>
+</header>
+
+<div class="grid">
+<form id="f" autocomplete="off">
+
+  <fieldset class="step">
+    <legend><b>1</b> Vos ressources de référence <span class="opt">facultatif</span></legend>
+    <p class="hint">Déposez un cours, un article, un document d'entreprise ou un exercice existant : son contenu sera intégré au prompt pour que l'IA s'appuie dessus. Le fichier est lu dans votre navigateur et n'est envoyé nulle part.</p>
+    <label class="drop" id="drop" for="files">
+      <input type="file" id="files" multiple>
+      <strong>Glissez vos fichiers ici</strong>
+      <span>ou cliquez pour parcourir — PDF, Word, PowerPoint, Excel, LibreOffice, texte, HTML…</span>
+    </label>
+    <div id="reslist" class="reslist"></div>
+    <details class="menu" id="m-paste">
+      <summary>Coller un texte ou une adresse web</summary>
+      <div class="menu-body">
+        <textarea id="pasteTxt" placeholder="Collez ici un extrait de cours, d'article… ou une adresse https://"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><input type="text" id="pasteName" placeholder="Nom de la ressource (facultatif)" style="flex:1;min-width:180px"><button class="btn" type="button" id="btn-paste">Ajouter</button></div>
+      </div>
+    </details>
+    <div class="cond" id="c-res">
+      <label class="f" for="resUse">Comment l'IA doit utiliser ces ressources</label>
+      <select id="resUse">
+        <option>Source principale : s'appuyer dessus en priorité, compléter seulement si nécessaire</option>
+        <option>Source unique : n'utiliser que leur contenu, ne rien inventer</option>
+        <option>Inspiration : reprendre le niveau, le style et les exemples</option>
+      </select>
+    </div>
+  </fieldset>
+
+  <fieldset class="step">
+    <legend><b>2</b> Classe et référentiel</legend>
+    <div class="row">
+      <div><label class="f" for="niveau">Classe</label>
+        <select id="niveau">
+          <option>Seconde Bac Pro famille des métiers de la relation client</option>
+          <option>Première Bac Pro MCV</option>
+          <option>Terminale Bac Pro MCV</option>
+        </select></div>
+      <div><label class="f" for="effectif">Effectif</label>
+        <input type="text" id="effectif" placeholder="ex. 28 élèves, demi-groupe de 14"></div>
+    </div>
+    <label class="f">Référentiel(s) mobilisé(s)</label>
+    <div class="refpick" id="refpick"></div>
+    <div id="refmenus"></div>
+  </fieldset>
+
+  <fieldset class="step">
+    <legend><b>3</b> Ce que vous voulez créer</legend>
+    <div class="chips" id="types"></div>
+    <div class="cond" id="c-jeu">
+      <label class="f" for="jeuType">Type de jeu</label>
+      <select id="jeuType"></select>
+    </div>
+    <div class="cond" id="c-escape">
+      <div class="row">
+        <div><label class="f" for="escFormat">Format de l'escape game</label>
+          <select id="escFormat"><option>Numérique (fichier HTML jouable)</option><option>Papier imprimable (enveloppes, cadenas, indices)</option><option>Hybride (papier + codes à saisir en ligne)</option></select></div>
+        <div><label class="f" for="escEnigmes">Nombre d'énigmes</label>
+          <input type="number" id="escEnigmes" min="3" max="12" value="5"></div>
+      </div>
+      <label class="f" for="escScenario">Scénario / univers (facultatif)</label>
+      <input type="text" id="escScenario" placeholder="ex. Le magasin doit ouvrir dans 45 min mais la réserve est sens dessus dessous…">
+    </div>
+    <div class="cond" id="c-app">
+      <label class="f" for="appType">Type d'application</label>
+      <select id="appType">
+        <option>Simulateur de vente (dialogue client à choix multiples)</option>
+        <option>Entraîneur de calculs commerciaux (prix, marges, TVA, remises)</option>
+        <option>Fiches-mémo interactives (flashcards avec répétition espacée)</option>
+        <option>Parcours d'apprentissage pas à pas (cours + exercices intégrés)</option>
+        <option>Générateur d'études de cas aléatoires</option>
+        <option>Outil de tri / classement (glisser-déposer)</option>
+        <option>Chronologie / schéma interactif à compléter</option>
+      </select>
+    </div>
+  </fieldset>
+
+  <fieldset class="step">
+    <legend><b>4</b> Contenu et contexte</legend>
+    <label class="f" for="theme">Notion ou thème précis</label>
+    <input type="text" id="theme" placeholder="ex. La prise de contact en magasin, la découverte des besoins (SONCAS)…">
+    <div class="row">
+      <div><label class="f" for="duree">Durée</label>
+        <select id="duree"><option>15 min</option><option>30 min</option><option>45 min</option><option selected>1 h</option><option>2 h</option><option>3 h</option><option>4 h (séquence)</option></select></div>
+      <div><label class="f" for="difficulte">Niveau de difficulté</label>
+        <select id="difficulte"><option>Découverte</option><option selected>Intermédiaire</option><option>Approfondissement</option><option>Progressif (du plus simple au plus complexe)</option></select></div>
+      <div><label class="f" for="nbItems">Nombre de questions / activités</label>
+        <input type="number" id="nbItems" min="1" max="60" value="12"></div>
+    </div>
+    <label class="f" for="entreprise">Entreprise ou contexte professionnel fil rouge (facultatif)</label>
+    <input type="text" id="entreprise" placeholder="ex. Décathlon de la zone commerciale, une boulangerie de quartier, l'entreprise de PFMP…">
+    <label class="f">Adaptations</label>
+    <div class="chips" id="adapt"></div>
+    <label class="f" for="extra">Consignes particulières</label>
+    <textarea id="extra" placeholder="ex. Prévoir un corrigé détaillé, s'appuyer sur un document de PFMP, éviter le vocabulaire anglais…"></textarea>
+  </fieldset>
+
+  <fieldset class="step">
+    <legend><b>5</b> Méthode pédagogique</legend>
+    <p class="hint">Plusieurs choix possibles : l'IA articulera les méthodes cochées.</p>
+    <div class="chips" id="methodes"></div>
+  </fieldset>
+
+  <fieldset class="step cond" id="c-inter">
+    <legend><b>6</b> Réglages du jeu ou de l'application</legend>
+    <label class="f">Palette de couleurs</label>
+    <div class="swatches" id="palettes"></div>
+    <div class="colors">
+      <label>Principale <input type="color" id="col1" value="#0B6E5F"></label>
+      <label>Secondaire <input type="color" id="col2" value="#F2B632"></label>
+      <label>Fond <input type="color" id="col3" value="#F7FAF9"></label>
+    </div>
+    <div class="row">
+      <div><label class="f" for="mode">Mode</label>
+        <select id="mode"><option>Entraînement</option><option>Évaluation</option><option>Les deux (choix au lancement)</option></select></div>
+      <div><label class="f" for="timer">Minuteur</label>
+        <select id="timer"><option>Sans minuteur</option><option>Minuteur global</option><option>Minuteur par question</option></select></div>
+      <div class="cond" id="c-timer"><label class="f" for="timerVal">Durée du minuteur</label>
+        <input type="text" id="timerVal" value="30 secondes par question"></div>
+      <div><label class="f" for="points">Points</label>
+        <select id="points"><option>Compter les points</option><option>Sans points</option><option>Points + bonus rapidité et séries</option></select></div>
+    </div>
+    <label class="f">Options</label>
+    <div class="chips" id="interOpts"></div>
+    <label class="f">Tableau de bord enseignant</label>
+    <div class="chips" id="dash"></div>
+    <div class="cond" id="c-dash">
+      <label class="f" for="dashMode">Collecte des résultats</label>
+      <select id="dashMode">
+        <option>Hors ligne, PC différents (recommandé) : code résultat + fichier résultat, importés par le professeur</option>
+        <option>Même appareil : résultats enregistrés dans le navigateur (salle info, tablettes partagées)</option>
+        <option>Google Sheets : envoi automatique via Internet, avec secours hors ligne</option>
+      </select>
+      <details class="menu" id="m-dashhelp">
+        <summary>Tuto : comment je récupère les résultats de mes élèves ?</summary>
+        <div class="tuto">
+          <p><b>Le principe.</b> Le jeu est un seul fichier HTML. L'élève joue, puis le jeu lui donne son résultat. Vous ouvrez le même fichier sur votre propre PC, cliquez sur l'espace professeur et importez les résultats : tout s'affiche dans le tableau de bord. Aucun serveur, aucun compte.</p>
+          <p><b>1. Hors ligne, PC différents (recommandé)</b> — marche sans Internet et quel que soit l'ordinateur de l'élève.</p>
+          <ol>
+            <li>Déposez le fichier HTML sur l'ENT, une clé USB ou le dossier partagé de la salle.</li>
+            <li>En fin de partie, l'élève clique sur <i>Copier mon code</i> ou <i>Télécharger mon fichier résultat</i>.</li>
+            <li>Il vous le transmet : message ENT, devoir à rendre, mail, ou fichier copié sur votre clé USB.</li>
+            <li>Sur votre PC, ouvrez le jeu, cliquez sur l'espace professeur, saisissez le code à 4 chiffres.</li>
+            <li>Collez les codes (plusieurs à la suite) ou glissez les fichiers résultat : le tableau se remplit et reste mémorisé sur votre PC.</li>
+            <li>Exportez en CSV pour Pronote ou un tableur, ou sauvegardez la session complète.</li>
+          </ol>
+          <p><b>2. Même appareil</b> — pour des tablettes ou des postes que vous consultez vous-même : les résultats restent dans le navigateur du poste. Pour regrouper plusieurs postes, exportez le fichier de chaque poste puis importez-les sur le vôtre.</p>
+          <p><b>3. Google Sheets</b> — les résultats arrivent seuls dans un tableur, mais il faut Internet et un compte Google. Si la connexion coupe, le jeu garde le résultat et propose le code de secours.</p>
+          <p class="hint">Le prompt demande à l'IA d'intégrer ce tuto dans l'espace professeur du jeu et une consigne courte pour les élèves.</p>
+        </div>
+      </details>
+    </div>
+  </fieldset>
+
+  <fieldset class="step cond" id="c-doc">
+    <legend><b>6</b> Mise en page du support élève</legend>
+    <div class="row">
+      <div><label class="f" for="style">Style visuel</label>
+        <select id="style"><option>Magazine coloré (encadrés, pictogrammes, titres accrocheurs)</option><option>Infographie (schémas, flèches, chiffres clés)</option><option>Bande dessinée / storytelling</option><option>Carnet de bord professionnel sobre</option><option>Carte mentale et fiches visuelles</option></select></div>
+      <div><label class="f" for="format">Format de sortie</label>
+        <select id="format"><option>Document Word / Google Docs (A4)</option><option>Page HTML imprimable (A4)</option><option>Diaporama (PowerPoint / Google Slides)</option><option>Présentation Canva (texte de chaque page)</option></select></div>
+    </div>
+    <label class="f">Palette du document</label>
+    <div class="swatches" id="palettesDoc"></div>
+    <label class="f">Éléments à inclure</label>
+    <div class="chips" id="docOpts"></div>
+  </fieldset>
+
+  <fieldset class="step">
+    <legend><b>7</b> Grilles d'évaluation</legend>
+    <div class="chips" id="grilles"></div>
+    <div class="cond" id="c-auto">
+      <label class="f" for="autoFormat">Format de l'auto-évaluation élève</label>
+      <select id="autoFormat"><option>Échelle à 4 niveaux (Pas encore / En cours / Acquis / Expert)</option><option>Smileys (😟 😐 🙂 😃)</option><option>Feux tricolores (rouge / orange / vert)</option><option>Phrases « Je sais… / Je sais faire… »</option></select>
+    </div>
+    <div class="cond" id="c-cps">
+      <label class="f">Compétences psychosociales à observer (Santé publique France)</label>
+      <div id="cpsmenus"></div>
+    </div>
+  </fieldset>
+
+  <fieldset class="step">
+    <legend><b>8</b> IA de destination</legend>
+    <div class="row">
+      <div><label class="f" for="ia">IA utilisée</label>
+        <select id="ia"><option>N'importe quelle IA</option><option>ChatGPT</option><option>Claude</option><option>Gemini</option><option>Le Chat (Mistral)</option><option>Copilot</option></select></div>
+      <div><label class="f" for="ton">Ton pour les élèves</label>
+        <select id="ton"><option>Bienveillant et motivant</option><option>Professionnel</option><option>Ludique et humoristique</option></select></div>
+    </div>
+  </fieldset>
+</form>
+
+<aside class="out">
+  <div class="panel">
+    <div class="panel-h">
+      <div><h2>Votre prompt</h2><div class="meta" id="meta">0 mot</div></div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="toast" id="toast" role="status"></span><button class="btn copy" id="btn-copy" type="button">Copier le prompt</button></div>
+    </div>
+    <pre id="preview" tabindex="0" aria-label="Prompt Markdown généré"></pre>
+  </div>
+  <div class="tips">
+    <h3>Mode d'emploi</h3>
+    <ol>
+      <li>Cochez les compétences et réglez les options : le prompt se met à jour en direct.</li>
+      <li>Cliquez sur <strong>Copier le prompt</strong>, puis collez-le dans l'IA de votre choix.</li>
+      <li>Pour un jeu ou une application, demandez un <strong>fichier HTML unique</strong> : enregistrez-le et ouvrez-le dans un navigateur, ou déposez-le sur l'ENT.</li>
+      <li>Relisez toujours le contenu produit : l'IA peut se tromper sur le droit ou les chiffres.</li>
+    </ol>
+  </div>
+</aside>
+</div>
+<footer>Sources : Vademecum seconde famille des métiers de la relation client (2019), référentiel Bac Pro Métiers du commerce et de la vente (annexes I), programme d'économie-droit des bacs pro tertiaires, compétences psychosociales (Santé publique France). Vos réglages restent enregistrés dans votre navigateur.</footer>
+</div>
+
+<script>
+// ---------- Données des référentiels ----------
+const REF = {
+  seconde: {label:"Seconde MRC", long:"Vademecum seconde famille des métiers de la relation client", groups:[
+    {t:"Intégrer la relation client dans un cadre « omnicanal »", items:["Prendre contact","Identifier le besoin","Identifier le client et ses caractéristiques","Proposer une solution adaptée au parcours client"]},
+    {t:"Assurer le suivi de la relation client", items:["Gérer le suivi de la demande","Satisfaire le client","Fidéliser le client"]},
+    {t:"Collecter et exploiter l'information dans le cadre de la relation client", items:["Assurer la veille informationnelle et commerciale","Traiter et exploiter l'information","Diffuser l'information"]}
+  ]},
+  mcvA: {label:"MCV option A", long:"Bac Pro Métiers du commerce et de la vente, option A Animation et gestion de l'espace commercial", blocs:["b1","b2","b3","b4A"]},
+  mcvB: {label:"MCV option B", long:"Bac Pro Métiers du commerce et de la vente, option B Prospection clientèle et valorisation de l'offre commerciale", blocs:["b1","b2","b3","b4B"]},
+  eco: {label:"Économie-droit", long:"Programme d'économie-droit des baccalauréats professionnels tertiaires", groups:[
+    {t:"Partie 1 — Le contexte économique de l'activité professionnelle", subs:[
+      {t:"1-1 Les métiers et le contexte professionnel", items:["Les métiers et les emplois du secteur (secteur d'activité, branche, métier, qualification)","Les niveaux de formation, diplômes et titres professionnels","Le contexte institutionnel (chambres consulaires, organisations professionnelles, administrations)"]},
+      {t:"1-2 Les organisations", items:["La diversité des organisations (entreprises, organisations publiques, à but non lucratif)","Finalités et objectifs des organisations (besoins, service public, création de richesse)","Les acteurs et les partenaires des organisations"]},
+      {t:"1-3 Les entreprises", items:["Typologie, formes et statuts juridiques des entreprises","Structures d'entreprise et prise de décision","L'entreprise et son marché (clientèle, fournisseurs, concurrence, politique commerciale)"]}]},
+    {t:"Partie 2 — Le cadre juridique de l'organisation sociale", subs:[
+      {t:"2-1 La place du droit dans l'organisation de la vie publique", items:["Fonctions et caractères du droit (règle de droit, droits subjectifs)","Les droits fondamentaux, les devoirs et les obligations","Les sources du droit et la hiérarchie des normes"]},
+      {t:"2-2 Les sujets de droit et leurs prérogatives", items:["La personnalité juridique : personnes physiques et morales","Actes et faits juridiques, droits patrimoniaux et extrapatrimoniaux","La preuve des droits (charge, modes, admissibilité)","La responsabilité civile (fait générateur, dommage, lien de causalité, réparation)"]},
+      {t:"2-3 La mise en œuvre du droit", items:["L'organisation judiciaire : ordres de juridiction et compétences","Les acteurs du système juridique et le déroulement d'une instance"]}]},
+    {t:"Partie 3 — Les relations sociales dans les organisations", subs:[
+      {t:"3-1 Les ressources humaines", items:["Le management des ressources humaines (motivation, styles de direction, communication interne)","Le recrutement et la non-discrimination à l'embauche"]},
+      {t:"3-2 Le déroulement de carrière", items:["Le contrat de travail (types, clauses, rupture)","La durée du travail, les temps de repos et les congés","La rémunération et la formation du personnel"]},
+      {t:"3-3 Les relations collectives au travail", items:["La négociation collective, conventions et accords","La représentation des salariés","Les conflits collectifs"]}]},
+    {t:"Partie 4 — La création de richesse", subs:[
+      {t:"4-1 La production et l'organisation du travail", items:["Les facteurs de production et leur combinaison, le progrès technique","La productivité et ses déterminants","L'organisation de la production et du travail (flux tendu, sous-traitance, flexibilité)"]},
+      {t:"4-2 La création de richesse par l'entreprise", items:["La valeur ajoutée : calcul et partage","La performance et la rentabilité de l'entreprise"]},
+      {t:"4-3 La croissance et le développement économiques", items:["La croissance et ses indicateurs (PIB, pouvoir d'achat, niveau de vie)","Le développement et le développement durable (IDH)"]}]},
+    {t:"Partie 5 — L'organisation des échanges", subs:[
+      {t:"5-1 La notion de marché", items:["Le marché et le principe de concurrence","Structures de marché, équilibre et formation des prix","La consommation des ménages et ses déterminants"]},
+      {t:"5-2 Le cadre juridique des échanges", items:["Les libertés économiques et le droit de propriété (corporelle, incorporelle)","Les obligations et le contrat (validité, effets, inexécution)"]}]},
+    {t:"Partie 6 — La régulation économique", subs:[
+      {t:"6-1 La régulation du marché par le droit", items:["La régulation de la concurrence (concentrations, concurrence déloyale, autorités)","La protection du consommateur (formation et exécution du contrat)"]},
+      {t:"6-2 La régulation de l'activité économique par les autorités publiques", items:["Les politiques économiques et la lutte contre les déséquilibres (inflation, chômage)"]},
+      {t:"6-3 Les revenus, leur répartition et la redistribution", items:["Les revenus primaires et les inégalités","La redistribution par l'État et la protection sociale"]}]}
+  ]}
+};
+const BLOCS = {
+  b1:{t:"Bloc 1 — Conseiller et vendre", subs:[
+    {t:"Assurer la veille commerciale", items:["Rechercher, hiérarchiser, exploiter et actualiser en continu les informations sur l'entreprise et son marché","Maîtriser la technologie des produits","Sélectionner les outils de recherche d'information les plus adaptés"]},
+    {t:"Réaliser la vente dans un cadre omnicanal", items:["Intégrer l'omnicanal dans le processus de vente","Prendre contact avec le client","S'adapter au contexte commercial et au comportement du client","Découvrir, analyser et reformuler les besoins du client, ses motivations et ses freins","Présenter l'entreprise et/ou ses produits et services","Conseiller le client en proposant la solution adaptée","Argumenter et traiter les objections","Réaliser une démonstration le cas échéant","Proposer les produits et/ou services associés","Conclure la vente et prendre congé"]},
+    {t:"Assurer l'exécution de la vente", items:["Mettre en place les modalités de règlement et de livraison","Respecter les règles de confidentialité et de déontologie"]}]},
+  b2:{t:"Bloc 2 — Suivre les ventes", subs:[
+    {t:"Assurer le suivi de la commande du produit et/ou du service", items:["Suivre l'évolution de la commande et éventuellement du règlement","Informer le client des délais et des modalités de mise à disposition"]},
+    {t:"Mettre en œuvre le ou les services associés", items:["Sélectionner le cas échéant le prestataire le plus adapté","Collecter et transmettre les informations au service de l'entreprise","Suivre l'exécution du ou des services associés et en rendre compte","Effectuer le cas échéant les relances"]},
+    {t:"Traiter les retours et les réclamations du client", items:["Identifier le(s) problème(s) rencontré(s) par le client","Proposer une solution adaptée en tenant compte des procédures de l'entreprise et de la réglementation"]},
+    {t:"S'assurer de la satisfaction du client", items:["Collecter les informations de satisfaction auprès des clients","Mesurer et analyser la satisfaction du client","Transmettre les informations sur la satisfaction du client","Exploiter les informations recueillies à des fins d'amélioration","Proposer des éléments de nature à améliorer la satisfaction client"]}]},
+  b3:{t:"Bloc 3 — Fidéliser la clientèle et développer la relation client", subs:[
+    {t:"Traiter et exploiter l'information ou le contact client", items:["Traiter les messages et/ou les demandes des clients","Recueillir, extraire, exploiter, synthétiser les données (sources internes et externes)","Rendre compte des données appropriées","Proposer des actions de fidélisation et de développement de la relation client"]},
+    {t:"Contribuer à des actions de fidélisation et de développement de la relation client", items:["Sélectionner et mettre en œuvre les outils de fidélisation de l'entreprise","Concourir à la préparation et à l'organisation d'événements ou d'opérations de fidélisation","Participer à la mise en œuvre des événements ou opérations de fidélisation","Effectuer des ventes au rebond","Réaliser les opérations de suivi post-événement"]},
+    {t:"Évaluer les actions de fidélisation et de développement de la relation client", items:["Enrichir et actualiser le système d'information commercial (SIC)","Mesurer et analyser les résultats","Rendre compte","Proposer des axes d'amélioration"]}]},
+  b4A:{t:"Bloc 4A — Animer et gérer l'espace commercial", subs:[
+    {t:"Assurer les opérations préalables à la vente", items:["Établir les commandes des produits auprès de la centrale d'achats et/ou des fournisseurs","Préparer les commandes des clients issues de l'omnicanal","Veiller à la gestion rigoureuse des stocks et au réapprovisionnement","Réceptionner, contrôler et stocker les marchandises","Effectuer les relances et préparer les retours fournisseurs","Établir le prix en fonction de variables commerciales données et étiqueter les produits","Enrichir et exploiter le système d'information commercial","Participer aux opérations d'inventaire","Identifier les invendus et lutter contre la démarque","Gérer les retours et les échanges"]},
+    {t:"Rendre l'unité commerciale attractive et fonctionnelle", items:["Implanter les produits selon une logique commerciale","Accueillir, informer et orienter le client dans l'unité commerciale et à l'extérieur","Mettre en place la signalétique","Participer à l'agencement de la surface de vente, aménager la vitrine et/ou le rayon","Mettre en scène l'offre et en optimiser la visibilité","Veiller au respect des règles d'hygiène et de sécurité","Valoriser l'offre sur les sites marchands et les réseaux sociaux"]},
+    {t:"Développer la clientèle", items:["Proposer des actions commerciales génératrices de trafic","Sélectionner les gammes de produits à mettre en avant","Participer à la planification et à l'organisation des actions de promotion","Recourir aux sites marchands et aux réseaux sociaux","Inciter à l'achat par une action commerciale, le cas échéant interactive","Participer à l'évaluation et à l'analyse des performances des actions commerciales"]}]},
+  b4B:{t:"Bloc 4B — Prospecter et valoriser l'offre commerciale", subs:[
+    {t:"Rechercher et analyser les informations à des fins d'exploitation", items:["Identifier, au sein du SIC, les informations internes utiles à la prospection, les extraire et les analyser","Collecter, traiter et analyser les informations externes","Mettre à jour le système d'information commercial"]},
+    {t:"Participer à la conception d'une opération de prospection", items:["Définir la cible en cohérence avec la stratégie de l'organisation et les moyens alloués","Élaborer le plan de prospection et le plan de tournée","Construire et/ou mettre à jour le fichier prospects","Sélectionner et/ou concevoir des outils d'aide à la prospection et des supports de communication"]},
+    {t:"Mettre en œuvre une opération de prospection", items:["Établir le contact avec le prospect (physique et/ou à distance)","Identifier les besoins du prospect","Argumenter et traiter les objections","Établir un climat de confiance","Conclure et prendre congé"]},
+    {t:"Suivre et évaluer l'action de prospection", items:["Traiter et exploiter les informations recueillies, mettre à jour le fichier","Définir les actions à mener auprès des contacts","Mesurer et analyser les résultats et les écarts par rapport aux objectifs","Proposer les actions correctives et rendre compte"]},
+    {t:"Valoriser les produits et/ou les services", items:["Mettre en valeur l'offre dans un salon, un showroom, un espace éphémère, chez le client","Valoriser l'offre sur les sites marchands et les réseaux sociaux"]}]}
+};
+const CPS = [
+  {t:"CPS cognitives", subs:[
+    {t:"Avoir conscience de soi", items:["Connaissance de soi (forces, limites, valeurs)","Savoir penser de façon critique","Capacité d'auto-évaluation positive","Capacité d'attention à soi"]},
+    {t:"Capacité de maîtrise de soi", items:["Gérer ses impulsions","Atteindre ses buts (définition, planification)"]},
+    {t:"Prendre des décisions constructives", items:["Faire des choix responsables","Résoudre des problèmes de façon créative"]}]},
+  {t:"CPS émotionnelles", subs:[
+    {t:"Avoir conscience de ses émotions et de son stress", items:["Identifier ses émotions et son stress","Comprendre les émotions et le stress"]},
+    {t:"Réguler ses émotions", items:["Gérer ses émotions (colère, anxiété, tristesse)","Exprimer ses émotions de façon positive"]},
+    {t:"Gérer son stress", items:["Réguler son stress au quotidien","Faire face en situation d'adversité (coping)"]}]},
+  {t:"CPS sociales", subs:[
+    {t:"Communiquer de façon constructive", items:["Écoute empathique","Communication efficace (valorisation, formulations claires)"]},
+    {t:"Développer des relations constructives", items:["Développer des liens sociaux","Attitudes prosociales (collaboration, coopération, entraide)"]},
+    {t:"Résoudre des difficultés", items:["Savoir demander de l'aide","Assertivité et capacité de refus","Résoudre des conflits de façon constructive"]}]}
+];
+
+const TYPES = [
+  {id:"jeu", t:"Jeu éducatif", s:"quiz, mots croisés, memory…", inter:true},
+  {id:"app", t:"Application", s:"simulateur, entraîneur…", inter:true},
+  {id:"escape", t:"Escape game", s:"énigmes et scénario", inter:true},
+  {id:"seance", t:"Séance ludique", s:"déroulé + supports", doc:true},
+  {id:"cours", t:"Support de cours", s:"fiche élève, synthèse", doc:true},
+  {id:"exos", t:"Fiche d'exercices", s:"progressifs + corrigé", doc:true},
+  {id:"td", t:"TD / étude de cas", s:"situation professionnelle", doc:true},
+  {id:"eval", t:"Évaluation", s:"sommative ou formative", doc:true}
+];
+const JEUX = ["Quiz à choix multiples (QCM)","Vrai ou faux chronométré","Mots croisés","Mots mêlés","Memory (paires notion / définition)","Pendu du vocabulaire commercial","Glisser-déposer : classer et associer","Remettre dans l'ordre (étapes de la vente, procédure)","Texte à trous","Jeu du millionnaire (paliers et jokers)","Jeu de l'oie / plateau numérique","Loto / bingo des notions","Dominos question-réponse","Flashcards recto-verso","Roue de la fortune des questions","Qui suis-je ? (devinettes à indices)","Time's Up / Taboo du vocabulaire","Jeu de rôle guidé (simulation client)","Enquête / Cluedo commercial","Battle de questions en équipes (type buzzer)"];
+const METHODES = [
+  ["Puzzle (jigsaw)","groupes d'experts puis groupes de restitution"],
+  ["Inductive","partir d'exemples concrets pour construire la notion"],
+  ["Déductive","notion d'abord, puis application"],
+  ["Classe inversée","découverte à la maison, approfondissement en classe"],
+  ["Pédagogie de projet","production finale concrète"],
+  ["Apprentissage par problème","résoudre une situation professionnelle"],
+  ["Étude de cas","analyse d'une entreprise réelle ou fictive"],
+  ["Jeu de rôle / simulation","mise en situation vendeur-client"],
+  ["Ateliers tournants","îlots avec activités différentes"],
+  ["Ludopédagogie","apprendre par le jeu"],
+  ["Démarche d'investigation","questionner, chercher, conclure"],
+  ["Travail coopératif","rôles attribués, entraide"],
+  ["Débat argumenté","prises de position et arguments"],
+  ["Carte mentale","structurer et mémoriser"],
+  ["Pédagogie différenciée","parcours selon le niveau"],
+  ["Alternance PFMP","exploiter l'expérience en entreprise"]
+];
+const ADAPT = ["Élèves à besoins particuliers (DYS : police lisible, consignes courtes)","Allophones (vocabulaire simplifié + lexique)","Trois niveaux de difficulté","Exploitation des PFMP","Coup de pouce / indices pour les élèves en difficulté","Activité bonus pour les plus rapides"];
+const INTER_OPTS = ["Correction immédiate expliquée","Questions et réponses mélangées","Niveaux qui se débloquent","Effets sonores (désactivables)","Saisie du prénom au démarrage","Écran récapitulatif des erreurs","Adapté au téléphone et à la tablette","Mode équipe (vidéoprojecteur)","Badges et récompenses"];
+const DASH = ["Tableau de bord enseignant","Export CSV des résultats","Statistiques par question (taux de réussite)","Graphiques de synthèse"];
+const DOC_OPTS = ["Encadrés « À retenir »","Pictogrammes et icônes","Lexique illustré","Schémas et tableaux","Synthèse finale à trous","Corrigé enseignant séparé","Déroulé minuté pour l'enseignant","Documents ressources (annexes)","QR codes vers des ressources","Consignes numérotées et verbes d'action en gras"];
+const GRILLES = ["Grille d'auto-évaluation élève","Grille enseignant d'observation des CPS","Grille d'évaluation des compétences du référentiel","Barème détaillé"];
+const PALETTES = [
+  ["Boutique",["#0B6E5F","#F2B632","#F7FAF9"]],
+  ["Océan",["#1D4E89","#4FB0C6","#F3F8FC"]],
+  ["Pop",["#E63973","#FFC233","#FFF8F0"]],
+  ["Nuit",["#7C5CFF","#25D0A6","#141826"]],
+  ["Terre",["#7A4E2D","#9BB068","#FAF6F0"]],
+  ["Contraste élevé",["#000000","#FFD400","#FFFFFF"]]
+];
+
+// ---------- Construction de l'interface ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let cbId = 0;
+
+function chips(container, list, name, type="checkbox", big=false){
+  $(container).innerHTML = list.map((it,i)=>{
+    const [t,s] = Array.isArray(it) ? it : (typeof it === "object" ? [it.t,it.s] : [it,""]);
+    const v = typeof it === "object" && it.id ? it.id : t;
+    return `<label class="chip${big?" big":""}" ${s&&!big?`title="${esc(s)}"`:""}><input type="${type}" name="${name}" id="${name}-${i}" value="${esc(v)}"><span>${esc(t)}${big&&s?`<small>${esc(s)}</small>`:""}</span></label>`;
+  }).join("");
+}
+function subsHTML(prefix, subs){
+  return subs.map((s,si)=>`<div class="sub"><label class="sub-h"><input type="checkbox" data-all="${prefix}-${si}" id="${prefix}-${si}-all">${esc(s.t)}</label>${
+    s.items.map((it,ii)=>`<label class="cbl"><input type="checkbox" class="comp" data-grp="${prefix}-${si}" id="${prefix}-${si}-${ii}" data-sub="${esc(s.t)}" value="${esc(it)}">${esc(it)}</label>`).join("")}</div>`).join("");
+}
+function menu(id, title, body, open=false){
+  return `<details class="menu" id="m-${id}"${open?" open":""}><summary>${esc(title)}<span class="count" data-count="${id}"></span></summary><div class="menu-body">${body}</div></details>`;
+}
+function buildRefs(){
+  $("#refpick").innerHTML = Object.entries(REF).map(([k,r])=>`<label class="chip big"><input type="checkbox" name="ref" id="ref-${k}" value="${k}"><span>${esc(r.label)}<small>${esc(k==="seconde"?"Vademecum 2019":k==="eco"?"Programme commun tertiaire":k==="mcvA"?"Blocs 1, 2, 3 et 4A":"Blocs 1, 2, 3 et 4B")}</small></span></label>`).join("");
+  let h = "";
+  for(const [k,r] of Object.entries(REF)){
+    let inner = "";
+    if(k==="seconde") inner = r.groups.map((g,gi)=>menu(`${k}-${gi}`, g.t, subsHTML(`${k}-${gi}`, [{t:"Tout ce groupe", items:g.items}]))).join("");
+    else if(k==="eco") inner = r.groups.map((g,gi)=>menu(`${k}-${gi}`, g.t, subsHTML(`${k}-${gi}`, g.subs))).join("");
+    else inner = r.blocs.map(b=>menu(`${k}-${b}`, BLOCS[b].t, subsHTML(`${k}-${b}`, BLOCS[b].subs))).join("");
+    h += `<div class="cond refblock" id="rb-${k}" data-ref="${k}" hidden><label class="f">${esc(r.long)}</label>${inner}</div>`;
+  }
+  $("#refmenus").innerHTML = h;
+  $("#cpsmenus").innerHTML = CPS.map((g,gi)=>menu(`cps-${gi}`, g.t, subsHTML(`cps-${gi}`, g.subs))).join("");
+}
+function buildPalettes(target, prefix){
+  $(target).innerHTML = PALETTES.map(([n,c],i)=>`<button type="button" class="sw" data-pal="${prefix}" data-i="${i}" id="${prefix}-${i}"><i>${c.map(x=>`<em style="background:${x}"></em>`).join("")}</i>${esc(n)}</button>`).join("");
+}
+chips("#types", TYPES, "type", "radio", true);
+$("#jeuType").innerHTML = JEUX.map(j=>`<option>${esc(j)}</option>`).join("");
+chips("#methodes", METHODES, "meth");
+chips("#adapt", ADAPT, "adapt");
+chips("#interOpts", INTER_OPTS, "iopt");
+chips("#dash", DASH, "dash");
+chips("#docOpts", DOC_OPTS, "dopt");
+chips("#grilles", GRILLES, "grille");
+buildRefs();
+buildPalettes("#palettes","pal");
+buildPalettes("#palettesDoc","pald");
+let palDoc = 0;
+
+// ---------- Ressources déposées ----------
+const RES = [];
+const ROLES = ["Cours","Article de presse","Document d'entreprise","Exercice ou évaluation existant","Texte juridique","Données chiffrées","Autre"];
+const MAX_PER = 15000, MAX_ALL = 45000;
+const LIBS = {
+  pdf:["https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js","https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"],
+  mammoth:["https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"],
+  jszip:["https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"],
+  xlsx:["https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"]
+};
+const loaded = {};
+function loadLib(name){
+  return loaded[name] ||= LIBS[name].reduce((pr,url)=>pr.then(()=>new Promise((ok,ko)=>{
+    const s = document.createElement("script"); s.src = url; s.onload = ok; s.onerror = ()=>ko(new Error("Bibliothèque indisponible")); document.head.appendChild(s);
+  })), Promise.resolve());
+}
+const xmlText = (xml, para) => xml.replace(para, "\n").replace(/<[^>]+>/g, "").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,"&");
+async function zipText(file, pattern, para){
+  await loadLib("jszip");
+  const zip = await JSZip.loadAsync(await file.arrayBuffer());
+  const names = Object.keys(zip.files).filter(n=>pattern.test(n)).sort((a,b)=>(+(a.match(/(\d+)\.xml$/)||[0,0])[1])-(+(b.match(/(\d+)\.xml$/)||[0,0])[1]));
+  const parts = [];
+  for(const n of names){ const t = xmlText(await zip.file(n).async("string"), para).replace(/\n{3,}/g,"\n\n").trim(); if(t) parts.push(names.length>1 && /slide/.test(n) ? `[Diapositive ${parts.length+1}]\n${t}` : t); }
+  return parts.join("\n\n");
+}
+async function extract(file){
+  const ext = (file.name.split(".").pop() || "").toLowerCase();
+  if(["txt","md","markdown","csv","tsv","json","xml","srt","vtt","tex","log"].includes(ext) || /^text\//.test(file.type) && !/html|rtf/.test(file.type)) return file.text();
+  if(["html","htm"].includes(ext)){ const d = new DOMParser().parseFromString(await file.text(),"text/html"); d.querySelectorAll("script,style,nav,footer").forEach(n=>n.remove()); return d.body.innerText || d.body.textContent; }
+  if(ext==="rtf") return (await file.text()).replace(/\\par[d]?/g,"\n").replace(/\{\\\*[^{}]*\}/g,"").replace(/\\'([0-9a-f]{2})/gi,(m,h)=>String.fromCharCode(parseInt(h,16))).replace(/\\[a-z]+-?\d* ?/gi,"").replace(/[{}]/g,"");
+  if(ext==="pdf"){
+    await loadLib("pdf");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.pdf[0];
+    const doc = await pdfjsLib.getDocument({data: new Uint8Array(await file.arrayBuffer())}).promise;
+    const pages = [];
+    for(let i=1;i<=doc.numPages;i++){ const c = await (await doc.getPage(i)).getTextContent(); pages.push(c.items.map(it=>it.str+(it.hasEOL?"\n":" ")).join("").replace(/[ \t]+\n/g,"\n").trim()); }
+    return pages.join("\n\n");
+  }
+  if(ext==="docx"){ await loadLib("mammoth"); return (await mammoth.extractRawText({arrayBuffer: await file.arrayBuffer()})).value; }
+  if(ext==="pptx") return zipText(file, /^ppt\/slides\/slide\d+\.xml$/, /<\/a:p>/g);
+  if(["xlsx","xls","ods"].includes(ext)){
+    await loadLib("xlsx");
+    const wb = XLSX.read(await file.arrayBuffer(), {type:"array"});
+    return wb.SheetNames.map(n=>`[Feuille ${n}]\n`+XLSX.utils.sheet_to_csv(wb.Sheets[n],{FS:" ; "}).replace(/^( ; )+$/gm,"").replace(/\n{2,}/g,"\n")).join("\n\n");
+  }
+  if(["odt","odp"].includes(ext)) return zipText(file, /^content\.xml$/, /<\/text:(p|h)>/g);
+  return null;
+}
+const fmtSize = n => n<1024 ? n+" o" : n<1048576 ? Math.round(n/1024)+" Ko" : (n/1048576).toFixed(1)+" Mo";
+function guessRole(name){
+  const n = name.toLowerCase();
+  if(/cours|synth|le[çc]on|fiche/.test(n)) return "Cours";
+  if(/article|presse|journal/.test(n)) return "Article de presse";
+  if(/exo|exercice|eval|devoir|td|quiz/.test(n)) return "Exercice ou évaluation existant";
+  if(/code|loi|contrat|cgv|juri/.test(n)) return "Texte juridique";
+  if(/xls|csv|ods/.test(n.split(".").pop())) return "Données chiffrées";
+  return "Cours";
+}
+async function addFiles(list){
+  for(const file of list){
+    const r = {id: Date.now()+Math.random(), name:file.name, ext:(file.name.includes(".")?file.name.split(".").pop():"?").slice(0,5), size:file.size, text:null, status:"loading", role:guessRole(file.name), include:true};
+    RES.push(r); renderRes();
+    try{
+      const t = await extract(file);
+      if(t && t.trim().length > 20){ r.text = t.replace(/\r/g,"").replace(/[ \t]{2,}/g," ").replace(/\n{3,}/g,"\n\n").trim(); r.status = "ok"; }
+      else { r.status = "attach"; r.include = false; }
+    }catch(err){ r.status = "attach"; r.include = false; r.err = err.message; }
+    renderRes(); syncUI();
+  }
+}
+function renderRes(){
+  $("#reslist").innerHTML = RES.map(r=>{
+    let st = "";
+    if(r.status==="loading") st = `<div class="st">Lecture du fichier…</div>`;
+    else if(r.status==="ok") st = `<div class="st ok">Texte extrait : ${r.text.length.toLocaleString("fr-FR")} caractères${r.text.length>MAX_PER?` (les ${MAX_PER.toLocaleString("fr-FR")} premiers seront intégrés au prompt)`:""}</div>`;
+    else if(r.status==="url") st = `<div class="st ok">Adresse web : l'IA sera invitée à consulter la page</div>`;
+    else st = `<div class="st warn">Contenu non lisible ici${r.err?` (${esc(r.err)})`:""} : joignez ce fichier à votre message dans l'IA, le prompt le lui signalera.</div>`;
+    const canInclude = r.status==="ok";
+    return `<div class="res" data-id="${r.id}"><span class="ext">${esc(r.ext)}</span><span class="nm">${esc(r.name)} <small style="font-weight:400;color:var(--muted)">${r.size!=null?fmtSize(r.size):""}</small></span><button type="button" class="rm" data-rm="${r.id}" aria-label="Retirer ${esc(r.name)}">×</button>${st}
+      <div class="ctl"><label>Rôle <select data-role="${r.id}" aria-label="Rôle de ${esc(r.name)}">${ROLES.map(o=>`<option${o===r.role?" selected":""}>${esc(o)}</option>`).join("")}</select></label>${canInclude?`<label><input type="checkbox" data-inc="${r.id}"${r.include?" checked":""}> Intégrer le texte au prompt</label>`:""}</div></div>`;
+  }).join("");
+}
+const drop = $("#drop");
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop", e=>{ if(e.dataTransfer.files.length) addFiles([...e.dataTransfer.files]); });
+$("#files").addEventListener("change", e=>{ addFiles([...e.target.files]); e.target.value = ""; });
+$("#reslist").addEventListener("click", e=>{ const id = e.target.closest("[data-rm]")?.dataset.rm; if(!id) return; RES.splice(RES.findIndex(r=>String(r.id)===id),1); renderRes(); syncUI(); });
+$("#reslist").addEventListener("change", e=>{
+  const t = e.target, r = RES.find(x=>String(x.id)===(t.dataset.role||t.dataset.inc)); if(!r) return;
+  if(t.dataset.role) r.role = t.value; else r.include = t.checked;
+  syncUI();
+});
+$("#btn-paste").addEventListener("click", ()=>{
+  const txt = $("#pasteTxt").value.trim(); if(!txt) return;
+  const isUrl = /^https?:\/\/\S+$/.test(txt);
+  RES.push({id:Date.now(), name: val("pasteName") || (isUrl ? txt : `Texte collé ${RES.length+1}`), ext: isUrl?"web":"txt", size:null, text: isUrl?null:txt, url: isUrl?txt:null, status: isUrl?"url":"ok", role: isUrl?"Article de presse":"Cours", include:!isUrl});
+  $("#pasteTxt").value = ""; $("#pasteName").value = "";
+  renderRes(); syncUI();
+});
+
+function resourcesSection(p){
+  const ready = RES.filter(r=>r.status!=="loading");
+  if(!ready.length) return;
+  p("## Ressources de référence");
+  p(`**Consigne d'utilisation** : ${val("resUse")}.`);
+  p("Rattache chaque activité à la ressource utilisée (« d'après Ressource 1 »). Si une ressource contredit le référentiel ou le droit en vigueur, signale-le en une ligne et suis le référentiel.");
+  p("");
+  let budget = MAX_ALL;
+  ready.forEach((r,i)=>{
+    p(`### Ressource ${i+1} — ${r.name} (${r.role.toLowerCase()})`);
+    if(r.status==="url") p(`Page web à consulter : ${r.url}. Si tu ne peux pas l'ouvrir, dis-le et demande-moi de coller son texte.`);
+    else if(r.status==="ok" && r.include && budget>0){
+      let t = r.text.slice(0, Math.min(MAX_PER, budget));
+      const cut = t.length < r.text.length;
+      budget -= t.length;
+      p(`<document nom="${r.name.replace(/"/g,"'")}">`);
+      p(t);
+      p(`</document>`);
+      if(cut) p(`_Extrait : ${t.length.toLocaleString("fr-FR")} caractères sur ${r.text.length.toLocaleString("fr-FR")}. Le document complet est joint à ce message si besoin._`);
+    }
+    else p(`Ce fichier est joint à mon message : lis-le entièrement avant de commencer.`);
+    p("");
+  });
+}
+
+// ---------- Lecture de l'état ----------
+const val = id => ($("#"+id).value || "").trim();
+const checked = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i=>i.value);
+function compsFor(prefixStart){
+  const out = {};
+  document.querySelectorAll(`input.comp[id^="${prefixStart}"]:checked`).forEach(i=>{
+    const menuTitle = i.closest("details").querySelector("summary").childNodes[0].textContent;
+    (out[menuTitle] ||= {});
+    (out[menuTitle][i.dataset.sub] ||= []).push(i.value);
+  });
+  return out;
+}
+
+function generate(){
+  const refs = checked("ref");
+  const type = checked("type")[0];
+  const T = TYPES.find(t=>t.id===type);
+  const meths = checked("meth");
+  const grilles = checked("grille");
+  const theme = val("theme") || "[précisez la notion]";
+  const L = [];
+  const p = s => L.push(s);
+
+  p(`# Mission : créer ${T ? articleType(type) : "une ressource pédagogique"} pour ${val("niveau").replace("Bac Pro","bac pro")}`);
+  p("");
+  p("## Ton rôle");
+  p(`Tu es un enseignant expert en économie-droit et en vente-commerce de lycée professionnel, formé à la didactique de la voie professionnelle${T&&T.inter?" et développeur web confirmé spécialisé dans les jeux éducatifs":""}. Tu connais les référentiels de l'Éducation nationale cités ci-dessous et tu les respectes à la lettre.`);
+  p("");
+  p("## Contexte");
+  p(`- **Classe** : ${val("niveau")}${val("effectif")?` — ${val("effectif")}`:""}`);
+  p(`- **Notion travaillée** : ${theme}`);
+  p(`- **Durée** : ${val("duree")}`);
+  p(`- **Niveau de difficulté** : ${val("difficulte")}`);
+  if(val("entreprise")) p(`- **Contexte professionnel fil rouge** : ${val("entreprise")} — toutes les situations s'y rattachent`);
+  p(`- **Ton employé avec les élèves** : ${val("ton").toLowerCase()}, vouvoiement ou tutoiement cohérent du début à la fin`);
+  p("");
+  resourcesSection(p);
+
+  p("## Compétences du référentiel visées");
+  if(!refs.length) p("_Aucun référentiel sélectionné : rattache l'activité aux compétences pertinentes de la classe indiquée et cite-les._");
+  for(const k of refs){
+    const r = REF[k];
+    p(`### ${r.long}`);
+    const c = compsFor(k+"-");
+    const keys = Object.keys(c);
+    if(!keys.length){ p("- _Aucune compétence cochée : choisis les plus pertinentes pour la notion travaillée et cite-les._"); continue; }
+    for(const g of keys){
+      p(`- **${g}**`);
+      for(const [sub, items] of Object.entries(c[g])){
+        if(sub==="Tout ce groupe") items.forEach(it=>p(`  - ${it}`));
+        else { p(`  - ${sub}`); items.forEach(it=>p(`    - ${it}`)); }
+      }
+    }
+  }
+  p("");
+  p("Chaque activité doit servir au moins une de ces compétences. Indique entre crochets la compétence travaillée à côté de chaque activité ou question.");
+  p("");
+
+  p("## Méthode pédagogique");
+  if(meths.length){
+    meths.forEach(m=>{ const d = METHODES.find(x=>x[0]===m); p(`- **${m}** : ${d?d[1]:""}`); });
+    p("Décris concrètement comment chaque méthode est mise en œuvre (organisation de la classe, rôle de l'enseignant, rôle des élèves, timing).");
+  } else p("Choisis la démarche la plus adaptée (active, centrée sur une situation professionnelle) et justifie-la en deux phrases.");
+  const adapt = checked("adapt");
+  if(adapt.length){ p(""); p("## Adaptations et différenciation"); adapt.forEach(a=>p(`- ${a}`)); }
+  p("");
+
+  p("## Livrable attendu");
+  if(!T) p("_Aucun type de ressource choisi._");
+  else if(type==="jeu"){
+    p(`Un jeu **${val("jeuType")}** de ${val("nbItems")} questions ou éléments, sur « ${theme} ».`);
+    const jt = val("jeuType");
+    if(/QCM|Vrai ou faux|millionnaire|Roue|Battle|Loto/.test(jt)) p("- Contenu exact, vérifié, au niveau de langue de la classe, avec des distracteurs plausibles tirés des erreurs fréquentes des élèves.");
+    else if(/Mots croisés|Mots mêlés|Pendu/.test(jt)) p("- Mots du vocabulaire professionnel et juridique de la notion, chacun avec une définition-indice claire ; grille générée automatiquement et vérifiée (mots sans accents ni espaces dans la grille).");
+    else p("- Contenu exact, vérifié, au niveau de langue de la classe, construit à partir des notions clés et des erreurs fréquentes des élèves.");
+    p(/Mots croisés|Mots mêlés|Pendu/.test(jt) ? "- Pour chaque mot : la définition, une explication courte (1 à 2 phrases) affichée après la partie et la compétence visée." : "- Pour chaque élément : la bonne réponse, une explication courte (1 à 2 phrases) et la compétence visée.");
+  } else if(type==="app"){
+    p(`Une application **${val("appType")}** sur « ${theme} », avec ${val("nbItems")} situations ou exercices.`);
+    p("- Écran d'accueil (titre, consigne, bouton Commencer), écrans d'activité, écran de résultats.");
+  } else if(type==="escape"){
+    p(`Un escape game **${val("escFormat").toLowerCase()}** de ${val("escEnigmes")} énigmes, durée totale ${val("duree")}, sur « ${theme} ».`);
+    p(`- Scénario : ${val("escScenario") || "propose un scénario immersif ancré dans une situation commerciale réaliste"}.`);
+    p("- Chaque énigme mobilise une notion du cours et donne un code (chiffres, mot, cadenas) qui débloque la suivante.");
+    p("- Prévois 2 indices progressifs par énigme, la solution complète et un débriefing final des notions.");
+    if(/Papier|Hybride/.test(val("escFormat"))) p("- Fournis le matériel à imprimer (documents, enveloppes numérotées, fiche de codes) et la fiche de préparation enseignant.");
+  } else if(type==="seance"){
+    p(`Une séance ludique complète de ${val("duree")} sur « ${theme} » comprenant :`);
+    p("1. Fiche de préparation enseignant : objectifs, prérequis, matériel, déroulé minuté (accroche, activités, mise en commun, synthèse, évaluation).");
+    p("2. Supports élèves prêts à distribuer (documents ressources, fiche de travail).");
+    p("3. Synthèse de cours à trous puis complétée.");
+    p("4. Corrigé enseignant.");
+  } else if(type==="cours"){
+    p(`Un support de cours élève sur « ${theme} » : accroche à partir d'une situation professionnelle, notions essentielles, exemples, application, synthèse et lexique.`);
+  } else if(type==="exos"){
+    p(`Une fiche de ${val("nbItems")} exercices progressifs sur « ${theme} » (repérer → comprendre → appliquer → analyser une situation), avec barème indicatif et corrigé séparé.`);
+  } else if(type==="td"){
+    p(`Un TD / étude de cas sur « ${theme} » : présentation de l'entreprise, documents annexes réalistes (fiche produit, mail client, tableau de ventes, extrait de contrat…), ${val("nbItems")} questions graduées, et corrigé détaillé.`);
+  } else if(type==="eval"){
+    p(`Une évaluation de ${val("duree")} sur « ${theme} » : mise en situation professionnelle, ${val("nbItems")} questions de difficulté croissante, barème sur 20 et corrigé avec critères de réussite.`);
+  }
+  p("");
+
+  if(T && T.inter && !(type==="escape" && /Papier/.test(val("escFormat")))){
+    const cols = [val("col1"),val("col2"),val("col3")];
+    const iopts = checked("iopt"), dash = checked("dash");
+    p("## Réglages du jeu / de l'application");
+    const modeTxt = {"Entraînement":"Entraînement (correction immédiate, tentatives illimitées)","Évaluation":"Évaluation (pas de correction pendant la partie, une seule tentative, résultat affiché à la fin)"}[val("mode")] || "Au choix au lancement : entraînement (correction immédiate, tentatives illimitées) ou évaluation (une seule tentative, pas de correction pendant la partie, résultat à la fin)";
+    p(`- **Mode** : ${modeTxt}`);
+    p(`- **Minuteur** : ${val("timer")}${val("timer")!=="Sans minuteur"?` — ${val("timerVal")}, affiché en grand avec barre de progression`:""}`);
+    p(`- **Points** : ${val("points")}`);
+    p(`- **Couleurs** : principale \`${cols[0]}\`, secondaire \`${cols[1]}\`, fond \`${cols[2]}\` (contraste lisible, conforme RGAA)`);
+    iopts.forEach(o=>p(`- ${o}`));
+    if(dash.length){
+      p("");
+      p("## Tableau de bord enseignant");
+      p("Ajoute un espace enseignant (accès par un bouton discret + code à 4 chiffres affiché dans ta réponse) qui présente :");
+      p("- la liste des élèves (prénom, date, durée, score, % de réussite, mode) ;");
+      dash.filter(d=>d!=="Tableau de bord enseignant").forEach(d=>p(`- ${d.charAt(0).toLowerCase()+d.slice(1)} ;`));
+      p("- le détail des réponses de chaque élève et les questions les plus échouées.");
+      const dm = val("dashMode");
+      p(`**Collecte des résultats** : ${dm}.`);
+      p("");
+      p("### Récupération des résultats (hors ligne et entre ordinateurs différents)");
+      if(/Hors ligne|Code résultat/.test(dm)){
+        p("Le jeu et le tableau de bord sont dans le même fichier : l'élève joue sur n'importe quel ordinateur, le professeur ouvre le même fichier sur le sien. Aucun serveur, aucune connexion requise.");
+        p("- **Côté élève, écran de fin** : deux boutons, « Copier mon code résultat » (texte compact : JSON encodé en base64, sans bibliothèque externe, préfixé par le titre du jeu) et « Télécharger mon fichier résultat » (`resultat-prenom-date.json`). Si la copie automatique est bloquée, le code s'affiche sélectionné dans une zone de texte.");
+        p("- Le résultat est aussi gardé dans le `localStorage` du poste, pour pouvoir le récupérer si l'élève ferme la page par erreur.");
+        p("- **Côté professeur** : une zone où coller plusieurs codes à la suite (un par ligne ou séparés par des espaces) et une zone de dépôt acceptant plusieurs fichiers résultat d'un coup.");
+        p("- Chaque résultat contient une somme de contrôle simple : un code modifié à la main est signalé « non vérifié ».");
+        p("- Les doublons (même prénom, même date et heure) sont ignorés à l'import.");
+      }
+      if(/Même appareil/.test(dm)){
+        p("- Les résultats sont enregistrés dans le `localStorage` du poste, avec un bouton pour vider les résultats.");
+        p("- Pour regrouper plusieurs postes : bouton « Exporter les résultats de ce poste » (fichier `.json`) et import de plusieurs fichiers dans le tableau de bord du professeur, sans doublons.");
+      }
+      if(/Google Sheets/.test(dm)){
+        p("- Fournis le script Google Apps Script à copier et la marche à suivre pas à pas pour le déployer en application web ; l'URL se colle dans une constante en haut du code.");
+        p("- **Secours hors ligne** : si l'envoi échoue (pas de connexion), le résultat est mis en file d'attente dans le `localStorage` et renvoyé automatiquement au retour du réseau ; l'élève reçoit aussi un code résultat de secours que le professeur peut coller dans le tableau de bord.");
+      }
+      p("- Le tableau de bord du professeur garde les résultats importés dans le `localStorage` de son ordinateur et propose : « Sauvegarder la session » (fichier `.json`), « Restaurer une session », « Exporter en CSV » (séparateur point-virgule, UTF-8 avec BOM pour Excel) et « Vider ».");
+      p("");
+      p("### Tuto intégré");
+      p("- Dans l'espace professeur, un onglet **Aide** avec un tuto illustré en 5 étapes numérotées : diffuser le fichier (ENT, clé USB, dossier partagé), faire jouer, récupérer les codes ou fichiers, les importer, exporter. Ajoute une rubrique « Problèmes fréquents » (copie bloquée, code incomplet, élève qui a fermé la page, résultats sur un autre PC).");
+      p("- Sur l'écran d'accueil élève, une consigne de 3 lignes maximum expliquant comment rendre son résultat.");    }
+    p("");
+    p("## Contraintes techniques");
+    if(type==="escape" && /Papier/.test(val("escFormat"))) p("- Livrable imprimable en A4, prêt à découper ; aucun outil numérique requis.");
+    else {
+      p(`- **Un seul fichier HTML** (HTML + CSS + JavaScript intégrés), sans installation, sans compte, fonctionnant hors ligne dans un navigateur récent${checked("dash").length && /Google Sheets/.test(val("dashMode")) ? " (seul l'envoi des résultats vers Google Sheets nécessite Internet)" : ""}.`);
+      p("- Aucune bibliothèque externe obligatoire ; si tu en utilises une, charge-la depuis un CDN fiable.");
+      p("- Responsive (ordinateur, tablette, téléphone), boutons larges, police lisible (16 px minimum).");
+      p("- Toutes les questions et réponses regroupées dans un tableau en haut du script pour que l'enseignant puisse les modifier facilement.");
+      p("- Aucune donnée personnelle autre que le prénom ; respect du RGPD.");
+    }
+    p("");
+  }
+
+  if(type==="escape" && /Papier/.test(val("escFormat"))){
+    p("## Contraintes de réalisation");
+    p("- Livrable imprimable en A4, prêt à découper ; aucun outil numérique requis.");
+    p(`- Durée : ${val("duree")}, ${val("nbItems")} éléments de jeu au maximum par énigme.`);
+    p("");
+  }
+
+  if(T && (T.doc || (type==="escape" && /Papier|Hybride/.test(val("escFormat"))))){
+    const pal = PALETTES[palDoc];
+    p("## Mise en page du support");
+    p(`- **Style** : ${val("style")}`);
+    p(`- **Format** : ${val("format")}`);
+    p(`- **Palette** : ${pal[0]} (\`${pal[1].join("`, `")}\`)`);
+    checked("dopt").forEach(o=>p(`- ${o}`));
+    p("- Hiérarchie visuelle claire : titres colorés, encadrés, espaces pour écrire, numérotation des activités, nom/prénom/date en en-tête.");
+    p("");
+  }
+
+  if(grilles.length){
+    p("## Grilles d'évaluation");
+    if(grilles.includes("Grille d'auto-évaluation élève")){
+      p(`### Auto-évaluation élève`);
+      p(`Format : ${val("autoFormat")}. Formule chaque critère en « Je sais… / Je suis capable de… », en lien direct avec les compétences visées (5 à 8 critères), et ajoute une ligne « Ce que je dois retravailler ».`);
+    }
+    if(grilles.includes("Grille enseignant d'observation des CPS")){
+      p("### Observation des compétences psychosociales (enseignant)");
+      const c = {};
+      document.querySelectorAll('input.comp[id^="cps-"]:checked').forEach(i=>(c[i.dataset.sub] ||= []).push(i.value));
+      const subs = Object.entries(c);
+      if(subs.length){ p("CPS à observer (référentiel Santé publique France) :"); subs.forEach(([s,items])=>p(`- **${s}** : ${items.join(" ; ")}`)); }
+      else p("Choisis 3 à 4 CPS du référentiel Santé publique France pertinentes pour l'activité.");
+      p("Pour chaque CPS : 1 à 2 comportements observables dans cette activité, niveaux Non observé / En émergence / Acquis / Expert, colonne commentaire, une ligne par élève.");
+    }
+    if(grilles.includes("Grille d'évaluation des compétences du référentiel")) p("### Compétences du référentiel\nTableau : compétence, critères d'évaluation, indicateurs de réussite observables, niveaux de maîtrise (1 à 4).");
+    if(grilles.includes("Barème détaillé")) p("### Barème\nBarème détaillé par question, total sur 20.");
+    p("");
+  }
+
+  if(val("extra")){ p("## Consignes particulières"); p(val("extra")); p(""); }
+
+  p("## Format de ta réponse");
+  if(T && T.inter && !(type==="escape" && /Papier/.test(val("escFormat")))){
+    p("1. Un récapitulatif en 5 lignes (objectifs, compétences, déroulé de la partie).");
+    p("2. Le code complet du fichier HTML dans un seul bloc, sans rien omettre ni abréger.");
+    p(checked("dash").length ? "3. Le tuto enseignant pas à pas : ouvrir et diffuser le fichier, faire jouer les élèves, récupérer les résultats hors ligne et depuis d'autres ordinateurs, consulter et exporter le tableau de bord. Termine par la consigne à donner aux élèves, prête à copier." : "3. Le mode d'emploi pour l'enseignant (ouvrir, diffuser, faire jouer).");
+  } else {
+    p("1. Les documents dans l'ordre d'utilisation, chacun avec un titre clair.");
+    p("2. Le corrigé enseignant à la fin, nettement séparé des supports élèves.");
+  }
+  if(val("ia")==="Claude") p("Si possible, produis le livrable dans un artefact.");
+  if(val("ia")==="ChatGPT") p("Si possible, utilise Canvas pour le livrable.");
+  p("");
+  p("## Avant de répondre, vérifie que");
+  p("- tout le contenu juridique et économique est exact et à jour (droit français en vigueur) ;");
+  p("- chaque activité est reliée à une compétence citée plus haut ;");
+  if(RES.length) p("- le contenu respecte les ressources de référence fournies, selon la consigne d'utilisation ;");
+  p("- le vocabulaire est accessible à des élèves de lycée professionnel ;");
+  p("- la durée annoncée est réaliste.");
+  p("Si une information te manque, fais une hypothèse raisonnable, signale-la en une ligne, puis produis le livrable complet sans t'arrêter.");
+  return L.join("\n");
+}
+function articleType(t){
+  return {jeu:"un jeu éducatif",app:"une application pédagogique",escape:"un escape game pédagogique",seance:"une séance de cours ludique",cours:"un support de cours",exos:"une fiche d'exercices",td:"un TD / étude de cas",eval:"une évaluation"}[t];
+}
+
+// ---------- Affichage ----------
+function highlight(md){
+  return md.split("\n").map(l=>{
+    const e = esc(l);
+    if(/^#{1,3} /.test(l)) return `<span class="h">${e}</span>`;
+    if(/^_.*_$/.test(l)) return `<span class="d">${e}</span>`;
+    return e.replace(/\*\*(.+?)\*\*/g,'<span class="k">**$1**</span>');
+  }).join("\n");
+}
+function syncUI(){
+  const refs = checked("ref");
+  document.querySelectorAll(".refblock").forEach(b=>b.hidden = !refs.includes(b.dataset.ref));
+  const type = checked("type")[0];
+  const T = TYPES.find(t=>t.id===type) || {};
+  $("#c-res").hidden = !RES.length;
+  $("#c-jeu").hidden = type!=="jeu";
+  $("#c-app").hidden = type!=="app";
+  $("#c-escape").hidden = type!=="escape";
+  const paper = type==="escape" && /Papier/.test(val("escFormat"));
+  $("#c-inter").hidden = !T.inter || paper;
+  $("#c-doc").hidden = !(T.doc || (type==="escape" && /Papier|Hybride/.test(val("escFormat"))));
+  $("#c-timer").hidden = val("timer")==="Sans minuteur";
+  $("#c-dash").hidden = !checked("dash").length;
+  const g = checked("grille");
+  $("#c-auto").hidden = !g.includes("Grille d'auto-évaluation élève");
+  $("#c-cps").hidden = !g.includes("Grille enseignant d'observation des CPS");
+  document.querySelectorAll("[data-count]").forEach(c=>{
+    const n = c.closest("details").querySelectorAll("input.comp:checked").length;
+    c.textContent = n ? `${n} cochée${n>1?"s":""}` : "";
+  });
+  document.querySelectorAll("[data-all]").forEach(a=>{
+    const items = [...document.querySelectorAll(`input.comp[data-grp="${a.dataset.all}"]`)];
+    const n = items.filter(i=>i.checked).length;
+    a.checked = n===items.length; a.indeterminate = n>0 && n<items.length;
+  });
+  const pal = [val("col1"),val("col2"),val("col3")].join().toLowerCase();
+  document.querySelectorAll('[data-pal="pal"]').forEach(b=>b.classList.toggle("on", PALETTES[b.dataset.i][1].join().toLowerCase()===pal));
+  document.querySelectorAll('[data-pal="pald"]').forEach(b=>b.classList.toggle("on", +b.dataset.i===palDoc));
+  const md = generate();
+  $("#preview").innerHTML = highlight(md);
+  const words = md.split(/\s+/).filter(Boolean).length;
+  $("#meta").textContent = `${words} mots · Markdown`;
+  save();
+}
+
+// ---------- Mémorisation locale ----------
+const KEY = "atelier-prompt-cv-v1";
+function snapshot(){
+  const s = {palDoc};
+  document.querySelectorAll("#f input, #f select, #f textarea").forEach(el=>{
+    if(!el.id || el.dataset.all || el.type==="file" || /^paste/.test(el.id)) return;
+    s[el.id] = (el.type==="checkbox"||el.type==="radio") ? el.checked : el.value;
+  });
+  return s;
+}
+function restore(s){
+  if(!s) return;
+  document.querySelectorAll("#f input, #f select, #f textarea").forEach(el=>{
+    if(!el.id || !(el.id in s) || el.type==="file") return;
+    if(el.type==="checkbox"||el.type==="radio") el.checked = !!s[el.id]; else el.value = s[el.id];
+    if(el.tagName==="SELECT" && el.selectedIndex<0) el.selectedIndex = 0;
+  });
+  if(typeof s.palDoc==="number") palDoc = s.palDoc;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(snapshot())); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+
+function setCheck(id,v=true){ const el=document.getElementById(id); if(el) el.checked=v; }
+function byValue(name, v){ const el=[...document.querySelectorAll(`input[name="${name}"]`)].find(i=>i.value===v); if(el) el.checked=true; }
+function clearAll(){
+  document.querySelectorAll("#f input[type=checkbox], #f input[type=radio]").forEach(i=>{i.checked=false;i.indeterminate=false});
+  document.querySelectorAll("#f input[type=text], #f textarea").forEach(i=>i.value="");
+  document.querySelectorAll("#f select").forEach(s=>s.selectedIndex=0);
+  $("#duree").value="1 h"; $("#difficulte").value="Intermédiaire"; $("#nbItems").value=12; $("#escEnigmes").value=5;
+  $("#timerVal").value="30 secondes par question";
+  $("#col1").value="#0b6e5f"; $("#col2").value="#f2b632"; $("#col3").value="#f7faf9"; palDoc=0;
+  document.querySelectorAll("details.menu").forEach(d=>d.open=false);
+}
+function loadExample(){
+  clearAll();
+  $("#niveau").selectedIndex = 0;
+  $("#effectif").value = "28 élèves, en salle informatique";
+  setCheck("ref-seconde");
+  setCheck("seconde-0-0-0"); setCheck("seconde-0-0-1"); setCheck("seconde-0-0-2");
+  document.getElementById("m-seconde-0").open = true;
+  setCheck("type-0");
+  $("#jeuType").value = "Quiz à choix multiples (QCM)";
+  $("#theme").value = "La prise de contact et la découverte des besoins du client (questionnement, écoute active, SONCAS)";
+  $("#duree").value = "30 min";
+  $("#entreprise").value = "Un magasin de sport en centre commercial";
+  byValue("meth","Ludopédagogie"); byValue("meth","Inductive");
+  byValue("adapt","Élèves à besoins particuliers (DYS : police lisible, consignes courtes)");
+  $("#timer").value = "Minuteur par question";
+  $("#points").value = "Points + bonus rapidité et séries";
+  $("#mode").value = "Les deux (choix au lancement)";
+  ["Correction immédiate expliquée","Questions et réponses mélangées","Saisie du prénom au démarrage","Écran récapitulatif des erreurs","Adapté au téléphone et à la tablette"].forEach(v=>byValue("iopt",v));
+  ["Tableau de bord enseignant","Export CSV des résultats","Statistiques par question (taux de réussite)"].forEach(v=>byValue("dash",v));
+  byValue("grille","Grille d'auto-évaluation élève"); byValue("grille","Grille enseignant d'observation des CPS");
+  setCheck("cps-2-0-0"); setCheck("cps-2-0-1"); setCheck("cps-1-2-0");
+  syncUI();
+}
+
+// ---------- Événements ----------
+$("#f").addEventListener("input", e=>{
+  const t = e.target;
+  if(t.dataset.all){ document.querySelectorAll(`input.comp[data-grp="${t.dataset.all}"]`).forEach(i=>i.checked=t.checked); }
+  if(t.name==="ref" && t.checked){ const first = document.querySelector(`#rb-${t.value} details`); if(first) first.open = true; }
+  syncUI();
+});
+$("#f").addEventListener("submit", e=>e.preventDefault());
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-pal]"); if(!b) return;
+  const c = PALETTES[b.dataset.i][1];
+  if(b.dataset.pal==="pal"){ $("#col1").value=c[0]; $("#col2").value=c[1]; $("#col3").value=c[2]; }
+  else palDoc = +b.dataset.i;
+  syncUI();
+});
+$("#btn-example").addEventListener("click", loadExample);
+$("#btn-reset").addEventListener("click", ()=>{ clearAll(); RES.length = 0; renderRes(); syncUI(); });
+$("#btn-copy").addEventListener("click", ()=>{
+  const md = generate();
+  const done = msg=>{ $("#toast").textContent = msg; setTimeout(()=>$("#toast").textContent="", 2600); };
+  const fallback = ()=>{ const r=document.createRange(); r.selectNodeContents($("#preview")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); done("Texte sélectionné : Cmd/Ctrl + C"); };
+  try{ navigator.clipboard.writeText(md).then(()=>done("Prompt copié"), fallback); }catch(err){ fallback(); }
+});
+
+const saved = load();
+if(saved){ restore(saved); syncUI(); } else loadExample();
+</script>
+
+</body>
+</html>
