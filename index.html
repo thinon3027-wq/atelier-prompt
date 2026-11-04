@@ -243,7 +243,8 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
     </div>
     <label class="f" for="entreprise">Entreprise ou contexte professionnel fil rouge (facultatif)</label>
     <input type="text" id="entreprise" placeholder="ex. Décathlon de la zone commerciale, une boulangerie de quartier, l'entreprise de PFMP…">
-    <label class="f">Adaptations</label>
+    <label class="f">Différenciation et adaptations</label>
+    <p class="hint">Valable quel que soit le support choisi (jeu, application, escape game, fiche, TD, évaluation) : l'IA adaptera la différenciation au format.</p>
     <div class="chips" id="adapt"></div>
     <label class="f" for="extra">Consignes particulières</label>
     <textarea id="extra" placeholder="ex. Prévoir un corrigé détaillé, s'appuyer sur un document de PFMP, éviter le vocabulaire anglais…"></textarea>
@@ -471,7 +472,7 @@ const METHODES = [
   ["Pédagogie différenciée","parcours selon le niveau"],
   ["Alternance PFMP","exploiter l'expérience en entreprise"]
 ];
-const ADAPT = ["Élèves à besoins particuliers (DYS : police lisible, consignes courtes)","Allophones (vocabulaire simplifié + lexique)","Trois niveaux de difficulté","Exploitation des PFMP","Coup de pouce / indices pour les élèves en difficulté","Activité bonus pour les plus rapides"];
+const ADAPT = ["Trois niveaux de difficulté","Coup de pouce / indices pour les élèves en difficulté","Activité bonus pour les plus rapides","Élèves à besoins particuliers (DYS : police lisible, consignes courtes)","Allophones (vocabulaire simplifié + lexique)","Temps majoré (tiers-temps PAP / PPS)","Consignes lues à voix haute (audio)","Travail en binôme ou tutorat entre pairs","Parcours choisi par l'élève (★ / ★★ / ★★★)","Exploitation des PFMP"];
 const INTER_OPTS = ["Correction immédiate expliquée","Questions et réponses mélangées","Niveaux qui se débloquent","Effets sonores (désactivables)","Saisie du prénom au démarrage","Écran récapitulatif des erreurs","Adapté au téléphone et à la tablette","Mode équipe (vidéoprojecteur)","Badges et récompenses"];
 const DASH = ["Tableau de bord enseignant","Export CSV des résultats","Statistiques par question (taux de réussite)","Graphiques de synthèse"];
 const DOC_OPTS = ["Encadrés « À retenir »","Pictogrammes et icônes","Lexique illustré","Schémas et tableaux","Synthèse finale à trous","Corrigé enseignant séparé","Déroulé minuté pour l'enseignant","Documents ressources (annexes)","QR codes vers des ressources","Consignes numérotées et verbes d'action en gras"];
@@ -723,7 +724,36 @@ function generate(){
     p("Décris concrètement comment chaque méthode est mise en œuvre (organisation de la classe, rôle de l'enseignant, rôle des élèves, timing).");
   } else p("Choisis la démarche la plus adaptée (active, centrée sur une situation professionnelle) et justifie-la en deux phrases.");
   const adapt = checked("adapt");
-  if(adapt.length){ p(""); p("## Adaptations et différenciation"); adapt.forEach(a=>p(`- ${a}`)); }
+  if(adapt.length){
+    p(""); p("## Différenciation et adaptations");
+    adapt.forEach(a=>p(`- ${a}`));
+    const papierEsc = type==="escape" && /Papier/.test(val("escFormat"));
+    const inter = T && T.inter && !papierEsc;
+    const has = r => adapt.some(a=>r.test(a));
+    p("");
+    if(inter){
+      p("**Mise en œuvre dans le jeu / l'application :**");
+      if(has(/niveaux|Parcours/)) p("- Écran de démarrage avec choix du niveau (★ découverte / ★★ standard / ★★★ expert) : chaque niveau a son propre jeu de questions dans le tableau de données, mêmes compétences visées.");
+      if(has(/Coup de pouce/)) p("- Bouton « Coup de pouce » sur chaque question (indice progressif, sans donner la réponse) ; en mode évaluation, chaque indice utilisé est comptabilisé.");
+      if(has(/bonus/)) p("- Défi bonus débloqué à la fin pour les plus rapides.");
+      if(has(/DYS/)) p("- Bouton « Confort de lecture » : police plus grande, interlignage 1,5, police adaptée aux DYS, pas de texte justifié ni en italique.");
+      if(has(/Allophones/)) p("- Lexique accessible à tout moment (mot → définition simple), phrases courtes au présent.");
+      if(has(/Temps majoré/)) p("- Option « Temps majoré » qui multiplie le minuteur par 1,33 (ou le supprime).");
+      if(has(/voix haute/)) p("- Bouton 🔊 sur chaque consigne et question, lecture par la synthèse vocale du navigateur (`speechSynthesis`, voix française), fonctionne hors ligne.");
+      if(has(/binôme/)) p("- Mode binôme : deux prénoms à la saisie, un résultat commun.");
+      if(checked("dash").length) p("- Le tableau de bord enseignant indique, pour chaque élève, le niveau choisi, le nombre d'indices utilisés et les aménagements activés.");
+    } else {
+      p("**Mise en œuvre dans les supports :**");
+      if(has(/niveaux|Parcours/)) p("- Trois versions repérées par des étoiles (★ / ★★ / ★★★), mêmes compétences et même corrigé de référence, avec un tableau de correspondance pour l'enseignant.");
+      if(has(/Coup de pouce/)) p(papierEsc ? "- Enveloppes « indice » numérotées, à demander au maître du jeu." : "- Cartes « coup de pouce » à découper (indices progressifs), placées en fin de document.");
+      if(has(/bonus/)) p("- Une activité bonus pour les plus rapides, signalée par un pictogramme.");
+      if(has(/DYS/)) p("- Version adaptée DYS : police sans empattement 14 pt, interlignage 1,5, une consigne par ligne, consignes numérotées, mots-clés en gras, pas de texte justifié.");
+      if(has(/Allophones/)) p("- Lexique illustré en encadré et consignes reformulées simplement.");
+      if(has(/Temps majoré/)) p("- Repère des exercices facultatifs pour les élèves bénéficiant d'un temps majoré (même note possible sans eux).");
+      if(has(/voix haute/)) p("- Consignes rédigées pour être lues à voix haute par l'enseignant ou un camarade (phrases courtes, une action par phrase).");
+      if(has(/binôme/)) p("- Rôles précisés pour le travail en binôme ou le tutorat (qui lit, qui écrit, qui vérifie).");
+    }
+  }
   p("");
 
   p("## Livrable attendu");
