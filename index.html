@@ -349,7 +349,7 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
   <div class="panel">
     <div class="panel-h">
       <div><h2>Votre prompt</h2><div class="meta" id="meta">0 mot</div></div>
-      <div style="display:flex;gap:8px;align-items:center"><span class="toast" id="toast" role="status"></span><button class="btn copy" id="btn-copy" type="button">Copier le prompt</button></div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="toast" id="toast" role="status"></span><button class="btn" id="btn-md" type="button" title="Enregistrer le prompt dans un fichier Markdown (.md)">Télécharger .md</button><button class="btn copy" id="btn-copy" type="button">Copier le prompt</button></div>
     </div>
     <pre id="preview" tabindex="0" aria-label="Prompt Markdown généré"></pre>
   </div>
@@ -357,7 +357,7 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
     <h3>Mode d'emploi</h3>
     <ol>
       <li>Cochez les compétences et réglez les options : le prompt se met à jour en direct.</li>
-      <li>Cliquez sur <strong>Copier le prompt</strong>, puis collez-le dans l'IA de votre choix.</li>
+      <li>Cliquez sur <strong>Copier le prompt</strong>, puis collez-le dans l'IA de votre choix. Ou cliquez sur <strong>Télécharger .md</strong> pour garder le prompt dans un fichier (à joindre à l'IA, à archiver ou à partager avec un collègue).</li>
       <li>Pour un jeu ou une application, demandez un <strong>fichier HTML unique</strong> : enregistrez-le et ouvrez-le dans un navigateur, ou déposez-le sur l'ENT.</li>
       <li>Relisez toujours le contenu produit : l'IA peut se tromper sur le droit ou les chiffres.</li>
     </ol>
@@ -1035,6 +1035,20 @@ $("#btn-copy").addEventListener("click", ()=>{
   const done = msg=>{ $("#toast").textContent = msg; setTimeout(()=>$("#toast").textContent="", 2600); };
   const fallback = ()=>{ const r=document.createRange(); r.selectNodeContents($("#preview")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); done("Texte sélectionné : Cmd/Ctrl + C"); };
   try{ navigator.clipboard.writeText(md).then(()=>done("Prompt copié"), fallback); }catch(err){ fallback(); }
+});
+$("#btn-md").addEventListener("click", ()=>{
+  const md = generate();
+  const done = msg=>{ $("#toast").textContent = msg; setTimeout(()=>$("#toast").textContent="", 3200); };
+  const slug = (val("theme") || (document.querySelector('input[name=type]:checked')||{}).value || "prompt")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50) || "prompt";
+  const name = `prompt-${slug}-${new Date().toISOString().slice(0,10)}.md`;
+  try{
+    const url = URL.createObjectURL(new Blob([md],{type:"text/markdown;charset=utf-8"}));
+    const a = Object.assign(document.createElement("a"),{href:url,download:name});
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    done(`Fichier ${name} téléchargé`);
+  }catch(err){ done("Téléchargement bloqué : utilisez Copier le prompt"); }
 });
 
 const saved = load();
