@@ -122,6 +122,7 @@ details.menu>summary .count{margin-left:auto;font-family:var(--f-mono);font-size
 .panel{background:var(--code-bg);color:var(--code-fg);border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
 .panel-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #ffffff1a}
 .panel-h h2{margin:0;font-family:var(--f-display);font-size:17px;color:#fff}
+.panel-h .warn{font-size:12.5px;color:var(--mark);margin-top:4px;max-width:46ch}
 .panel-h .meta{font-family:var(--f-mono);font-size:11.5px;color:var(--code-dim)}
 .panel pre{margin:0;padding:16px;font-family:var(--f-mono);font-size:12.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;max-height:calc(100vh - 220px);min-height:320px;overflow:auto}
 @media (max-width:980px){.panel pre{max-height:70vh}}
@@ -374,7 +375,7 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
 <aside class="out">
   <div class="panel">
     <div class="panel-h">
-      <div><h2>Votre prompt</h2><div class="meta" id="meta">0 mot</div></div>
+      <div><h2>Votre prompt</h2><div class="meta" id="meta">0 mot</div><div class="warn" id="warn" role="status" hidden></div></div>
       <div style="display:flex;gap:8px;align-items:center"><span class="toast" id="toast" role="status"></span><button class="btn" id="btn-md" type="button" title="Enregistrer le prompt dans un fichier Markdown (.md)">Télécharger .md</button><button class="btn copy" id="btn-copy" type="button">Copier le prompt</button></div>
     </div>
     <pre id="preview" tabindex="0" aria-label="Prompt Markdown généré"></pre>
@@ -500,7 +501,7 @@ const METHODES = [
 ];
 const DIFS = ["« Coup de pouce » pour les élèves en difficulté","« Pour aller plus loin » pour ceux qui vont vite","Aide dégressive : plus l'élève avance, moins il y a d'aide","Étapes en onglets (Étape 1, Étape 2, Étape 3…)","Degré choisi par l'élève"];
 const ADAPT = ["Élèves à besoins particuliers (DYS : police lisible, consignes courtes)","Allophones (vocabulaire simplifié + lexique)","Temps majoré (tiers-temps PAP / PPS)","Consignes lues à voix haute (audio)","Travail en binôme ou tutorat entre pairs","Exploitation des PFMP"];
-const INTER_OPTS = ["Correction immédiate expliquée","Questions et réponses mélangées","Niveaux qui se débloquent","Effets sonores (désactivables)","Saisie du prénom au démarrage","Écran récapitulatif des erreurs","Adapté au téléphone et à la tablette","Mode équipe (vidéoprojecteur)","Badges et récompenses"];
+const INTER_OPTS = ["Correction immédiate expliquée","Questions et réponses mélangées","Étapes qui se débloquent","Effets sonores (désactivables)","Saisie du prénom au démarrage","Écran récapitulatif des erreurs","Adapté au téléphone et à la tablette","Mode équipe (vidéoprojecteur)","Badges et récompenses"];
 const DASH = ["Tableau de bord enseignant","Export CSV des résultats","Statistiques par question (taux de réussite)","Graphiques de synthèse"];
 const DOC_OPTS = ["Encadrés « À retenir »","Pictogrammes au trait","Lexique professionnel","Schémas et tableaux","Synthèse finale à trous","Corrigé enseignant séparé","Déroulé minuté pour l'enseignant","Documents ressources (annexes)","QR codes vers des ressources","Consignes numérotées et verbes d'action en gras"];
 const GRILLES = ["Tableau des CPS (élève et professeur)","Grille d'auto-évaluation élève","Grille d'évaluation des compétences du référentiel","Barème détaillé"];
@@ -622,6 +623,7 @@ function guessRole(name){
   if(/exo|exercice|eval|devoir|td|quiz/.test(n)) return "Exercice ou évaluation existant";
   if(/code|loi|contrat|cgv|juri/.test(n)) return "Texte juridique";
   if(/xls|csv|ods/.test(n.split(".").pop())) return "Données chiffrées";
+  if(/^(png|jpe?g|gif|webp|heic|svg)$/.test(n.split(".").pop())) return "Autre";
   return "Cours";
 }
 async function addFiles(list){
@@ -637,11 +639,14 @@ async function addFiles(list){
   }
 }
 function renderRes(){
+  let budget = MAX_ALL;
+  RES.forEach(r=>{ r.over = false; if(r.status==="ok" && r.include){ if(budget<=0) r.over = true; budget -= Math.min(MAX_PER, r.text.length); } });
   $("#reslist").innerHTML = RES.map(r=>{
     let st = "";
     if(r.status==="loading") st = `<div class="st">Lecture du fichier…</div>`;
-    else if(r.status==="ok") st = `<div class="st ok">Texte extrait : ${r.text.length.toLocaleString("fr-FR")} caractères${r.text.length>MAX_PER?` (les ${MAX_PER.toLocaleString("fr-FR")} premiers seront intégrés au prompt)`:""}</div>`;
+    else if(r.status==="ok" && !(r.include && r.over)) st = `<div class="st ok">Texte extrait : ${r.text.length.toLocaleString("fr-FR")} caractères${r.text.length>MAX_PER?` (les ${MAX_PER.toLocaleString("fr-FR")} premiers seront intégrés au prompt)`:""}</div>`;
     else if(r.status==="url") st = `<div class="st ok">Adresse web : l'IA sera invitée à consulter la page</div>`;
+    else if(r.status==="ok" && r.include && r.over) st = `<div class="st warn">Texte extrait, mais la limite du prompt est atteinte : joignez ce fichier à votre message dans l'IA.</div>`;
     else st = `<div class="st warn">Contenu non lisible ici${r.err?` (${esc(r.err)})`:""} : joignez ce fichier à votre message dans l'IA, le prompt le lui signalera.</div>`;
     const canInclude = r.status==="ok";
     return `<div class="res" data-id="${r.id}"><span class="ext">${esc(r.ext)}</span><span class="nm">${esc(r.name)} <small style="font-weight:400;color:var(--muted)">${r.size!=null?fmtSize(r.size):""}</small></span><button type="button" class="rm" data-rm="${r.id}" aria-label="Retirer ${esc(r.name)}">×</button>${st}
@@ -656,13 +661,13 @@ $("#files").addEventListener("change", e=>{ addFiles([...e.target.files]); e.tar
 $("#reslist").addEventListener("click", e=>{ const id = e.target.closest("[data-rm]")?.dataset.rm; if(!id) return; RES.splice(RES.findIndex(r=>String(r.id)===id),1); renderRes(); syncUI(); });
 $("#reslist").addEventListener("change", e=>{
   const t = e.target, r = RES.find(x=>String(x.id)===(t.dataset.role||t.dataset.inc)); if(!r) return;
-  if(t.dataset.role) r.role = t.value; else r.include = t.checked;
+  if(t.dataset.role) r.role = t.value; else { r.include = t.checked; renderRes(); }
   syncUI();
 });
 $("#btn-paste").addEventListener("click", ()=>{
   const txt = $("#pasteTxt").value.trim(); if(!txt) return;
   const isUrl = /^https?:\/\/\S+$/.test(txt);
-  RES.push({id:Date.now(), name: val("pasteName") || (isUrl ? txt : `Texte collé ${RES.length+1}`), ext: isUrl?"web":"txt", size:null, text: isUrl?null:txt, url: isUrl?txt:null, status: isUrl?"url":"ok", role: isUrl?"Article de presse":"Cours", include:!isUrl});
+  RES.push({id:Date.now()+Math.random(), name: val("pasteName") || (isUrl ? txt : `Texte collé ${RES.length+1}`), ext: isUrl?"web":"txt", size:null, text: isUrl?null:txt, url: isUrl?txt:null, status: isUrl?"url":"ok", role: isUrl?"Article de presse":"Cours", include:!isUrl});
   $("#pasteTxt").value = ""; $("#pasteName").value = "";
   renderRes(); syncUI();
 });
@@ -687,6 +692,7 @@ function resourcesSection(p){
       p(`</document>`);
       if(cut) p(`_Extrait : ${t.length.toLocaleString("fr-FR")} caractères sur ${r.text.length.toLocaleString("fr-FR")}. Le document complet est joint à ce message si besoin._`);
     }
+    else if(/^(png|jpe?g|gif|webp|heic|svg)$/i.test(r.ext)) p(`Cette image est jointe à mon message : examine-la avant de commencer.`);
     else p(`Ce fichier est joint à mon message : lis-le entièrement avant de commencer.`);
     p("");
   });
@@ -774,7 +780,7 @@ function generate(){
     p(`Un escape game **${val("escFormat").toLowerCase()}** de ${val("escEnigmes")} énigmes, durée totale ${val("duree")}, sur « ${theme} ».`);
     p(`- Scénario : ${val("escScenario") || "propose un scénario immersif ancré dans une situation commerciale réaliste"}.`);
     p("- Chaque énigme mobilise une notion du cours et donne un code (chiffres, mot, cadenas) qui débloque la suivante.");
-    p("- Prévois 2 indices progressifs par énigme, la solution complète et un débriefing final des notions.");
+    p($("#diffOn").checked && checked("dif").some(d=>/Coup de pouce/.test(d)) ? "- Prévois les indices selon la section Différenciation, la solution complète de chaque énigme et un débriefing final des notions." : "- Prévois 2 indices progressifs par énigme, la solution complète et un débriefing final des notions.");
     if(/Papier|Hybride/.test(val("escFormat"))) p("- Fournis le matériel à imprimer (documents, enveloppes numérotées, fiche de codes) et la fiche de préparation enseignant.");
   } else if(type==="seance"){
     p(`Une séance ludique complète de ${val("duree")} sur « ${theme} » comprenant :`);
@@ -866,6 +872,7 @@ function generate(){
   if(T && T.inter && !(type==="escape" && /Papier/.test(val("escFormat")))){
     p("1. Un récapitulatif en 5 lignes (objectifs, compétences, déroulé de la partie).");
     p("2. Le code complet du fichier HTML dans un seul bloc, sans rien omettre ni abréger.");
+    if(type==="escape" && /Hybride/.test(val("escFormat"))) p("2 bis. Le matériel papier à imprimer (documents d'énigmes, enveloppes, fiche de codes), mis en page selon la charte graphique.");
     p(checked("dash").length ? "3. Le tuto enseignant pas à pas : ouvrir et diffuser le fichier, faire jouer les élèves, récupérer les résultats hors ligne et depuis d'autres ordinateurs, consulter et exporter le tableau de bord. Termine par la consigne à donner aux élèves, prête à copier." : "3. Le mode d'emploi pour l'enseignant (ouvrir, diffuser, faire jouer).");
   } else {
     p("1. Les documents élèves dans l'ordre d'utilisation, puis le document professeur (corrigés, synthèse de référence, déroulé), nettement séparé.");
@@ -922,9 +929,9 @@ function diffSection(p, type, T){
     if(has(/aller plus loin/)) p("- Une énigme bonus « Pour aller plus loin » pour les équipes les plus rapides.");
   } else {
     p("**Dans les documents :**");
-    p(`- Chaque activité (ou chaque exercice) est déclinée en ${n} degrés repérés par le pictogramme, sur la même page ou en fiches séparées, avec le même corrigé de référence.`);
+    if(has(/onglets/)) p(`- Les activités sont organisées en **étapes de difficulté croissante** : ${deg.map((d,i)=>`Étape ${i+1} = ${d.toLowerCase()}`).join(", ")}. Tous les élèves partent de l'étape 1 et avancent à leur rythme ; l'aide diminue d'une étape à l'autre.`);
+    else p(`- Chaque activité (ou chaque exercice) est déclinée en ${n} versions, une par degré, repérées par le pictogramme, avec le même corrigé de référence.`);
     if(type==="seance") p("- Dans la séance, chaque phase de travail précise ce que fait un élève au degré 1, au degré 2" + (n===3?" et au degré 3.":"."));
-    if(has(/onglets/)) p(`- Les activités sont organisées en étapes numérotées (Étape 1, Étape 2${n===3?", Étape 3":""}) qui suivent les degrés.`);
     if(has(/Coup de pouce/)) p("- Encadrés « Coup de pouce » (indices progressifs, amorces de réponse) placés en fin de document ou en cartes à découper, signalés par un pictogramme ; plus nombreux au degré 1, absents au dernier degré.");
     if(has(/aller plus loin/)) p("- Encadré « Pour aller plus loin » après les activités : une tâche plus complexe ou une ouverture professionnelle pour les élèves qui ont fini.");
     if(has(/choisi par l'élève/)) p("- L'élève choisit son degré de départ et peut changer en cours de route ; prévois une ligne « J'ai travaillé au degré … » en haut de la fiche.");
@@ -996,7 +1003,7 @@ function grillesSection(p, grilles, type, T){
     if(/8 colonnes/.test(val("autoFormat"))){
       p("Tableau à 8 colonnes, à l'identique : `Compétences attendues | Je débute (1) | Je progresse (2) | Je réussis (3) | Je maîtrise très bien (4) | Je me situe ✔ | Ce que je dois améliorer | Avis du professeur`.");
       p(`- Deux volets, dans cet ordre : ${grilles.includes("Tableau des CPS (élève et professeur)")?"**volet 1 — mes CPS** (les CPS ci-dessus, dont une ligne sur la coopération si l'activité est en groupe), puis ":""}**volet ${grilles.includes("Tableau des CPS (élève et professeur)")?"2":"1"} — les compétences du référentiel** réellement travaillées.`);
-      p("- 8 à 12 lignes au total ; descripteurs concrets à la première personne ; on passe du niveau 3 au niveau 4 par un **élément supplémentaire**, jamais par un adverbe.");
+      p("- 8 à 12 lignes au total ; descripteurs concrets à la première personne ; on passe de la colonne (3) à la colonne (4) par un **élément supplémentaire**, jamais par un adverbe.");
     } else p(`Format : ${val("autoFormat")}. Formule chaque critère en « Je sais… / Je suis capable de… », en lien direct avec les compétences visées (5 à 8 critères), et ajoute une ligne « Ce que je dois retravailler ».`);
   }
   if(grilles.includes("Grille d'évaluation des compétences du référentiel")) p("### Compétences du référentiel (professeur)\nTableau : compétence, critères d'évaluation, indicateurs de réussite observables, niveaux de maîtrise (1 à 4).");
@@ -1048,6 +1055,13 @@ function syncUI(){
   document.querySelectorAll('[data-pal="pal"]').forEach(b=>b.classList.toggle("on", PALETTES[b.dataset.i][1].join().toLowerCase()===pal));
   const dpal = [val("dcol1"),val("dcol2")].join().toLowerCase();
   document.querySelectorAll('[data-pal="pald"]').forEach(b=>b.classList.toggle("on", PALETTES[b.dataset.i][1].slice(0,2).join().toLowerCase()===dpal));
+  let num = 0;
+  document.querySelectorAll("#f > fieldset.step").forEach(fs=>{ if(!fs.hidden){ const b = fs.querySelector("legend b"); if(b) b.textContent = ++num; } });
+  const warn = [];
+  if(!type) warn.push("choisissez ce que vous voulez créer (étape 3)");
+  if(!val("theme")) warn.push("précisez la notion travaillée (étape 4)");
+  $("#warn").textContent = warn.length ? "À compléter : " + warn.join(" · ") : "";
+  $("#warn").hidden = !warn.length;
   const md = generate();
   $("#preview").innerHTML = highlight(md);
   const words = md.split(/\s+/).filter(Boolean).length;
