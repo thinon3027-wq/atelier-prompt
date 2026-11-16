@@ -236,16 +236,13 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
     <div class="row">
       <div><label class="f" for="duree">Durée</label>
         <select id="duree"><option>15 min</option><option>30 min</option><option>45 min</option><option selected>1 h</option><option>2 h</option><option>3 h</option><option>4 h (séquence)</option></select></div>
-      <div><label class="f" for="difficulte">Niveau de difficulté</label>
+      <div><label class="f" for="difficulte">Degré de difficulté de départ</label>
         <select id="difficulte"><option>Découverte</option><option selected>Intermédiaire</option><option>Approfondissement</option><option>Progressif (du plus simple au plus complexe)</option></select></div>
       <div><label class="f" for="nbItems">Nombre de questions / activités</label>
         <input type="number" id="nbItems" min="1" max="60" value="12"></div>
     </div>
     <label class="f" for="entreprise">Entreprise ou contexte professionnel fil rouge (facultatif)</label>
     <input type="text" id="entreprise" placeholder="ex. Décathlon de la zone commerciale, une boulangerie de quartier, l'entreprise de PFMP…">
-    <label class="f">Différenciation et adaptations</label>
-    <p class="hint">Valable quel que soit le support choisi (jeu, application, escape game, fiche, TD, évaluation) : l'IA adaptera la différenciation au format.</p>
-    <div class="chips" id="adapt"></div>
     <label class="f" for="extra">Consignes particulières</label>
     <textarea id="extra" placeholder="ex. Prévoir un corrigé détaillé, s'appuyer sur un document de PFMP, éviter le vocabulaire anglais…"></textarea>
   </fieldset>
@@ -256,8 +253,24 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
     <div class="chips" id="methodes"></div>
   </fieldset>
 
+  <fieldset class="step" id="s-diff">
+    <legend><b>6</b> Différenciation</legend>
+    <p class="hint">Disponible pour tous les supports : séance, cours, TD, exercices, évaluation, jeu, application, escape game. L'IA adapte la différenciation au format choisi.</p>
+    <div class="chips"><label class="chip"><input type="checkbox" id="diffOn" checked><span>Différencier ce support</span></label></div>
+    <div class="cond" id="c-diffon">
+      <div class="row">
+        <div><label class="f" for="degres">Degrés de difficulté</label>
+          <select id="degres"><option>3 degrés (degré 1, degré 2, degré 3)</option><option>2 degrés (degré 1, degré 2)</option></select></div>
+      </div>
+      <label class="f">Dispositifs</label>
+      <div class="chips" id="difs"></div>
+      <label class="f">Profils d'élèves à prendre en compte</label>
+      <div class="chips" id="adapt"></div>
+    </div>
+  </fieldset>
+
   <fieldset class="step cond" id="c-inter">
-    <legend><b>6</b> Réglages du jeu ou de l'application</legend>
+    <legend><b>7</b> Réglages du jeu ou de l'application</legend>
     <label class="f">Palette de couleurs</label>
     <div class="swatches" id="palettes"></div>
     <div class="colors">
@@ -308,25 +321,38 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
   </fieldset>
 
   <fieldset class="step cond" id="c-doc">
-    <legend><b>6</b> Mise en page du support élève</legend>
-    <div class="row">
-      <div><label class="f" for="style">Style visuel</label>
-        <select id="style"><option>Magazine coloré (encadrés, pictogrammes, titres accrocheurs)</option><option>Infographie (schémas, flèches, chiffres clés)</option><option>Bande dessinée / storytelling</option><option>Carnet de bord professionnel sobre</option><option>Carte mentale et fiches visuelles</option></select></div>
-      <div><label class="f" for="format">Format de sortie</label>
-        <select id="format"><option>Document Word / Google Docs (A4)</option><option>Page HTML imprimable (A4)</option><option>Diaporama (PowerPoint / Google Slides)</option><option>Présentation Canva (texte de chaque page)</option></select></div>
+    <legend><b>7</b> Mise en page du support élève</legend>
+    <label class="f" for="charte">Charte graphique</label>
+    <select id="charte">
+      <option>Automatique selon la classe (Seconde : bleu marine · Première et Terminale : vert émeraude)</option>
+      <option>Charte Seconde MRC : bleu marine, sobre, prête à photocopier</option>
+      <option>Charte Première / Terminale MCV : vert émeraude, sobre, prête à photocopier</option>
+      <option>Couleurs personnalisées</option>
+    </select>
+    <div class="cond" id="c-dcol">
+      <div class="swatches" id="palettesDoc"></div>
+      <div class="colors">
+        <label>Titres et contours <input type="color" id="dcol1" value="#007A55"></label>
+        <label>Filets et accents <input type="color" id="dcol2" value="#00C27C"></label>
+      </div>
     </div>
-    <label class="f">Palette du document</label>
-    <div class="swatches" id="palettesDoc"></div>
+    <div class="row">
+      <div><label class="f" for="format">Format du document</label>
+        <select id="format"><option>Page HTML mise en page (A4, à imprimer ou enregistrer en PDF)</option><option>Document Word (.docx)</option><option>Google Docs</option><option>Diaporama (PowerPoint / Google Slides)</option></select></div>
+      <div><label class="f" for="style">Ambiance</label>
+        <select id="style"><option>Sobre et professionnelle (recommandé)</option><option>Aérée et illustrée (pictogrammes au trait)</option><option>Infographie (schémas, chiffres clés)</option><option>Récit / bande dessinée</option></select></div>
+    </div>
     <label class="f">Éléments à inclure</label>
     <div class="chips" id="docOpts"></div>
   </fieldset>
 
   <fieldset class="step">
-    <legend><b>7</b> Grilles d'évaluation</legend>
+    <legend><b>8</b> Grilles d'évaluation et CPS</legend>
+    <p class="hint">Le tableau des CPS est proposé pour tous les supports : encadré élève « Mes CPS en jeu aujourd'hui », volet CPS de l'auto-évaluation et grille d'observation du professeur.</p>
     <div class="chips" id="grilles"></div>
     <div class="cond" id="c-auto">
       <label class="f" for="autoFormat">Format de l'auto-évaluation élève</label>
-      <select id="autoFormat"><option>Échelle à 4 niveaux (Pas encore / En cours / Acquis / Expert)</option><option>Smileys (😟 😐 🙂 😃)</option><option>Feux tricolores (rouge / orange / vert)</option><option>Phrases « Je sais… / Je sais faire… »</option></select>
+      <select id="autoFormat"><option>Tableau à 8 colonnes (Je débute → Je maîtrise très bien, Je me situe, À retravailler, Avis du professeur)</option><option>Échelle à 4 niveaux (Pas encore / En cours / Acquis / Expert)</option><option>Smileys (😟 😐 🙂 😃)</option><option>Feux tricolores (rouge / orange / vert)</option><option>Phrases « Je sais… / Je sais faire… »</option></select>
     </div>
     <div class="cond" id="c-cps">
       <label class="f">Compétences psychosociales à observer (Santé publique France)</label>
@@ -335,7 +361,7 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
   </fieldset>
 
   <fieldset class="step">
-    <legend><b>8</b> IA de destination</legend>
+    <legend><b>9</b> IA de destination</legend>
     <div class="row">
       <div><label class="f" for="ia">IA utilisée</label>
         <select id="ia"><option>N'importe quelle IA</option><option>ChatGPT</option><option>Claude</option><option>Gemini</option><option>Le Chat (Mistral)</option><option>Copilot</option></select></div>
@@ -430,17 +456,17 @@ const BLOCS = {
 };
 const CPS = [
   {t:"CPS cognitives", subs:[
-    {t:"Avoir conscience de soi", items:["Connaissance de soi (forces, limites, valeurs)","Savoir penser de façon critique","Capacité d'auto-évaluation positive","Capacité d'attention à soi"]},
-    {t:"Capacité de maîtrise de soi", items:["Gérer ses impulsions","Atteindre ses buts (définition, planification)"]},
-    {t:"Prendre des décisions constructives", items:["Faire des choix responsables","Résoudre des problèmes de façon créative"]}]},
+    {t:"Avoir conscience de soi", items:["C1 Connaissance de soi (forces, limites, valeurs)","C2 Savoir penser de façon critique","C3 Capacité d'auto-évaluation positive","C4 Capacité d'attention à soi"]},
+    {t:"Capacité de maîtrise de soi", items:["C5 Gérer ses impulsions","C6 Atteindre ses buts (définition, planification)"]},
+    {t:"Prendre des décisions constructives", items:["C7 Faire des choix responsables","C8 Résoudre des problèmes de façon créative"]}]},
   {t:"CPS émotionnelles", subs:[
-    {t:"Avoir conscience de ses émotions et de son stress", items:["Identifier ses émotions et son stress","Comprendre les émotions et le stress"]},
-    {t:"Réguler ses émotions", items:["Gérer ses émotions (colère, anxiété, tristesse)","Exprimer ses émotions de façon positive"]},
-    {t:"Gérer son stress", items:["Réguler son stress au quotidien","Faire face en situation d'adversité (coping)"]}]},
+    {t:"Avoir conscience de ses émotions et de son stress", items:["E2 Identifier ses émotions et son stress","E1 Comprendre les émotions et le stress"]},
+    {t:"Réguler ses émotions", items:["E4 Gérer ses émotions (colère, anxiété, tristesse)","E3 Exprimer ses émotions de façon positive"]},
+    {t:"Gérer son stress", items:["E5 Réguler son stress au quotidien","E6 Faire face en situation d'adversité"]}]},
   {t:"CPS sociales", subs:[
-    {t:"Communiquer de façon constructive", items:["Écoute empathique","Communication efficace (valorisation, formulations claires)"]},
-    {t:"Développer des relations constructives", items:["Développer des liens sociaux","Attitudes prosociales (collaboration, coopération, entraide)"]},
-    {t:"Résoudre des difficultés", items:["Savoir demander de l'aide","Assertivité et capacité de refus","Résoudre des conflits de façon constructive"]}]}
+    {t:"Communiquer de façon constructive", items:["S1 Écoute empathique","S2 Communication efficace (valorisation, formulations claires)"]},
+    {t:"Développer des relations constructives", items:["S3 Développer des liens sociaux","S4 Attitudes prosociales (coopération, entraide)"]},
+    {t:"Résoudre des difficultés", items:["S5 Savoir demander de l'aide","S6 Assertivité et capacité de refus","S7 Résoudre des conflits de façon constructive"]}]}
 ];
 
 const TYPES = [
@@ -472,11 +498,16 @@ const METHODES = [
   ["Pédagogie différenciée","parcours selon le niveau"],
   ["Alternance PFMP","exploiter l'expérience en entreprise"]
 ];
-const ADAPT = ["Trois niveaux de difficulté","Coup de pouce / indices pour les élèves en difficulté","Activité bonus pour les plus rapides","Élèves à besoins particuliers (DYS : police lisible, consignes courtes)","Allophones (vocabulaire simplifié + lexique)","Temps majoré (tiers-temps PAP / PPS)","Consignes lues à voix haute (audio)","Travail en binôme ou tutorat entre pairs","Parcours choisi par l'élève (★ / ★★ / ★★★)","Exploitation des PFMP"];
+const DIFS = ["« Coup de pouce » pour les élèves en difficulté","« Pour aller plus loin » pour ceux qui vont vite","Aide dégressive : plus l'élève avance, moins il y a d'aide","Étapes en onglets (Étape 1, Étape 2, Étape 3…)","Degré choisi par l'élève"];
+const ADAPT = ["Élèves à besoins particuliers (DYS : police lisible, consignes courtes)","Allophones (vocabulaire simplifié + lexique)","Temps majoré (tiers-temps PAP / PPS)","Consignes lues à voix haute (audio)","Travail en binôme ou tutorat entre pairs","Exploitation des PFMP"];
 const INTER_OPTS = ["Correction immédiate expliquée","Questions et réponses mélangées","Niveaux qui se débloquent","Effets sonores (désactivables)","Saisie du prénom au démarrage","Écran récapitulatif des erreurs","Adapté au téléphone et à la tablette","Mode équipe (vidéoprojecteur)","Badges et récompenses"];
 const DASH = ["Tableau de bord enseignant","Export CSV des résultats","Statistiques par question (taux de réussite)","Graphiques de synthèse"];
-const DOC_OPTS = ["Encadrés « À retenir »","Pictogrammes et icônes","Lexique illustré","Schémas et tableaux","Synthèse finale à trous","Corrigé enseignant séparé","Déroulé minuté pour l'enseignant","Documents ressources (annexes)","QR codes vers des ressources","Consignes numérotées et verbes d'action en gras"];
-const GRILLES = ["Grille d'auto-évaluation élève","Grille enseignant d'observation des CPS","Grille d'évaluation des compétences du référentiel","Barème détaillé"];
+const DOC_OPTS = ["Encadrés « À retenir »","Pictogrammes au trait","Lexique professionnel","Schémas et tableaux","Synthèse finale à trous","Corrigé enseignant séparé","Déroulé minuté pour l'enseignant","Documents ressources (annexes)","QR codes vers des ressources","Consignes numérotées et verbes d'action en gras"];
+const GRILLES = ["Tableau des CPS (élève et professeur)","Grille d'auto-évaluation élève","Grille d'évaluation des compétences du référentiel","Barème détaillé"];
+const CHARTES = {
+  seconde:{nom:"Charte Seconde MRC", c1:"#1F3864", c2:"#2E75B6", desc:"bleu marine"},
+  premiere:{nom:"Charte Première / Terminale MCV", c1:"#007A55", c2:"#00C27C", desc:"vert émeraude"}
+};
 const PALETTES = [
   ["Boutique",["#0B6E5F","#F2B632","#F7FAF9"]],
   ["Océan",["#1D4E89","#4FB0C6","#F3F8FC"]],
@@ -525,6 +556,7 @@ chips("#types", TYPES, "type", "radio", true);
 $("#jeuType").innerHTML = JEUX.map(j=>`<option>${esc(j)}</option>`).join("");
 chips("#methodes", METHODES, "meth");
 chips("#adapt", ADAPT, "adapt");
+chips("#difs", DIFS, "dif");
 chips("#interOpts", INTER_OPTS, "iopt");
 chips("#dash", DASH, "dash");
 chips("#docOpts", DOC_OPTS, "dopt");
@@ -692,7 +724,7 @@ function generate(){
   p(`- **Classe** : ${val("niveau")}${val("effectif")?` — ${val("effectif")}`:""}`);
   p(`- **Notion travaillée** : ${theme}`);
   p(`- **Durée** : ${val("duree")}`);
-  p(`- **Niveau de difficulté** : ${val("difficulte")}`);
+  p(`- **Degré de difficulté de départ** : ${val("difficulte")}`);
   if(val("entreprise")) p(`- **Contexte professionnel fil rouge** : ${val("entreprise")} — toutes les situations s'y rattachent`);
   p(`- **Ton employé avec les élèves** : ${val("ton").toLowerCase()}, vouvoiement ou tutoiement cohérent du début à la fin`);
   p("");
@@ -723,37 +755,7 @@ function generate(){
     meths.forEach(m=>{ const d = METHODES.find(x=>x[0]===m); p(`- **${m}** : ${d?d[1]:""}`); });
     p("Décris concrètement comment chaque méthode est mise en œuvre (organisation de la classe, rôle de l'enseignant, rôle des élèves, timing).");
   } else p("Choisis la démarche la plus adaptée (active, centrée sur une situation professionnelle) et justifie-la en deux phrases.");
-  const adapt = checked("adapt");
-  if(adapt.length){
-    p(""); p("## Différenciation et adaptations");
-    adapt.forEach(a=>p(`- ${a}`));
-    const papierEsc = type==="escape" && /Papier/.test(val("escFormat"));
-    const inter = T && T.inter && !papierEsc;
-    const has = r => adapt.some(a=>r.test(a));
-    p("");
-    if(inter){
-      p("**Mise en œuvre dans le jeu / l'application :**");
-      if(has(/niveaux|Parcours/)) p("- Écran de démarrage avec choix du niveau (★ découverte / ★★ standard / ★★★ expert) : chaque niveau a son propre jeu de questions dans le tableau de données, mêmes compétences visées.");
-      if(has(/Coup de pouce/)) p("- Bouton « Coup de pouce » sur chaque question (indice progressif, sans donner la réponse) ; en mode évaluation, chaque indice utilisé est comptabilisé.");
-      if(has(/bonus/)) p("- Défi bonus débloqué à la fin pour les plus rapides.");
-      if(has(/DYS/)) p("- Bouton « Confort de lecture » : police plus grande, interlignage 1,5, police adaptée aux DYS, pas de texte justifié ni en italique.");
-      if(has(/Allophones/)) p("- Lexique accessible à tout moment (mot → définition simple), phrases courtes au présent.");
-      if(has(/Temps majoré/)) p("- Option « Temps majoré » qui multiplie le minuteur par 1,33 (ou le supprime).");
-      if(has(/voix haute/)) p("- Bouton 🔊 sur chaque consigne et question, lecture par la synthèse vocale du navigateur (`speechSynthesis`, voix française), fonctionne hors ligne.");
-      if(has(/binôme/)) p("- Mode binôme : deux prénoms à la saisie, un résultat commun.");
-      if(checked("dash").length) p("- Le tableau de bord enseignant indique, pour chaque élève, le niveau choisi, le nombre d'indices utilisés et les aménagements activés.");
-    } else {
-      p("**Mise en œuvre dans les supports :**");
-      if(has(/niveaux|Parcours/)) p("- Trois versions repérées par des étoiles (★ / ★★ / ★★★), mêmes compétences et même corrigé de référence, avec un tableau de correspondance pour l'enseignant.");
-      if(has(/Coup de pouce/)) p(papierEsc ? "- Enveloppes « indice » numérotées, à demander au maître du jeu." : "- Cartes « coup de pouce » à découper (indices progressifs), placées en fin de document.");
-      if(has(/bonus/)) p("- Une activité bonus pour les plus rapides, signalée par un pictogramme.");
-      if(has(/DYS/)) p("- Version adaptée DYS : police sans empattement 14 pt, interlignage 1,5, une consigne par ligne, consignes numérotées, mots-clés en gras, pas de texte justifié.");
-      if(has(/Allophones/)) p("- Lexique illustré en encadré et consignes reformulées simplement.");
-      if(has(/Temps majoré/)) p("- Repère des exercices facultatifs pour les élèves bénéficiant d'un temps majoré (même note possible sans eux).");
-      if(has(/voix haute/)) p("- Consignes rédigées pour être lues à voix haute par l'enseignant ou un camarade (phrases courtes, une action par phrase).");
-      if(has(/binôme/)) p("- Rôles précisés pour le travail en binôme ou le tutorat (qui lit, qui écrit, qui vérifie).");
-    }
-  }
+  diffSection(p, type, T);
   p("");
 
   p("## Livrable attendu");
@@ -799,7 +801,7 @@ function generate(){
     p(`- **Mode** : ${modeTxt}`);
     p(`- **Minuteur** : ${val("timer")}${val("timer")!=="Sans minuteur"?` — ${val("timerVal")}, affiché en grand avec barre de progression`:""}`);
     p(`- **Points** : ${val("points")}`);
-    p(`- **Couleurs** : principale \`${cols[0]}\`, secondaire \`${cols[1]}\`, fond \`${cols[2]}\` (contraste lisible, conforme RGAA)`);
+    p(`- **Couleurs imposées** : principale \`${cols[0]}\`, secondaire \`${cols[1]}\`, fond \`${cols[2]}\`. Déclare-les en variables CSS (\`:root{--principale:${cols[0]};--secondaire:${cols[1]};--fond:${cols[2]}}\`) et n'utilise **aucune autre couleur** que ces trois-là, le texte (noir ou blanc selon le contraste), le vert et le rouge des bonnes et mauvaises réponses. Contraste conforme RGAA.`);
     iopts.forEach(o=>p(`- ${o}`));
     if(dash.length){
       p("");
@@ -840,6 +842,7 @@ function generate(){
       p(`- **Un seul fichier HTML** (HTML + CSS + JavaScript intégrés), sans installation, sans compte, fonctionnant hors ligne dans un navigateur récent${checked("dash").length && /Google Sheets/.test(val("dashMode")) ? " (seul l'envoi des résultats vers Google Sheets nécessite Internet)" : ""}.`);
       p("- Aucune bibliothèque externe obligatoire ; si tu en utilises une, charge-la depuis un CDN fiable.");
       p("- Responsive (ordinateur, tablette, téléphone), boutons larges, police lisible (16 px minimum).");
+      p("- **Esthétique sobre et soignée** : une seule famille de police sans empattement, beaucoup d'espace blanc, coins arrondis discrets, cartes à fin contour, pas de dégradés criards, pas d'émojis décoratifs (pictogrammes au trait uniquement), une hiérarchie claire (titre, consigne, zone de réponse, bouton).");
       p("- Toutes les questions et réponses regroupées dans un tableau en haut du script pour que l'enseignant puisse les modifier facilement.");
       p("- Aucune donnée personnelle autre que le prénom ; respect du RGPD.");
     }
@@ -853,36 +856,9 @@ function generate(){
     p("");
   }
 
-  if(T && (T.doc || (type==="escape" && /Papier|Hybride/.test(val("escFormat"))))){
-    const pal = PALETTES[palDoc];
-    p("## Mise en page du support");
-    p(`- **Style** : ${val("style")}`);
-    p(`- **Format** : ${val("format")}`);
-    p(`- **Palette** : ${pal[0]} (\`${pal[1].join("`, `")}\`)`);
-    checked("dopt").forEach(o=>p(`- ${o}`));
-    p("- Hiérarchie visuelle claire : titres colorés, encadrés, espaces pour écrire, numérotation des activités, nom/prénom/date en en-tête.");
-    p("");
-  }
+  if(T && (T.doc || (type==="escape" && /Papier|Hybride/.test(val("escFormat"))))) charteSection(p);
 
-  if(grilles.length){
-    p("## Grilles d'évaluation");
-    if(grilles.includes("Grille d'auto-évaluation élève")){
-      p(`### Auto-évaluation élève`);
-      p(`Format : ${val("autoFormat")}. Formule chaque critère en « Je sais… / Je suis capable de… », en lien direct avec les compétences visées (5 à 8 critères), et ajoute une ligne « Ce que je dois retravailler ».`);
-    }
-    if(grilles.includes("Grille enseignant d'observation des CPS")){
-      p("### Observation des compétences psychosociales (enseignant)");
-      const c = {};
-      document.querySelectorAll('input.comp[id^="cps-"]:checked').forEach(i=>(c[i.dataset.sub] ||= []).push(i.value));
-      const subs = Object.entries(c);
-      if(subs.length){ p("CPS à observer (référentiel Santé publique France) :"); subs.forEach(([s,items])=>p(`- **${s}** : ${items.join(" ; ")}`)); }
-      else p("Choisis 3 à 4 CPS du référentiel Santé publique France pertinentes pour l'activité.");
-      p("Pour chaque CPS : 1 à 2 comportements observables dans cette activité, niveaux Non observé / En émergence / Acquis / Expert, colonne commentaire, une ligne par élève.");
-    }
-    if(grilles.includes("Grille d'évaluation des compétences du référentiel")) p("### Compétences du référentiel\nTableau : compétence, critères d'évaluation, indicateurs de réussite observables, niveaux de maîtrise (1 à 4).");
-    if(grilles.includes("Barème détaillé")) p("### Barème\nBarème détaillé par question, total sur 20.");
-    p("");
-  }
+  if(grilles.length) grillesSection(p, grilles, type, T);
 
   if(val("extra")){ p("## Consignes particulières"); p(val("extra")); p(""); }
 
@@ -892,20 +868,140 @@ function generate(){
     p("2. Le code complet du fichier HTML dans un seul bloc, sans rien omettre ni abréger.");
     p(checked("dash").length ? "3. Le tuto enseignant pas à pas : ouvrir et diffuser le fichier, faire jouer les élèves, récupérer les résultats hors ligne et depuis d'autres ordinateurs, consulter et exporter le tableau de bord. Termine par la consigne à donner aux élèves, prête à copier." : "3. Le mode d'emploi pour l'enseignant (ouvrir, diffuser, faire jouer).");
   } else {
-    p("1. Les documents dans l'ordre d'utilisation, chacun avec un titre clair.");
-    p("2. Le corrigé enseignant à la fin, nettement séparé des supports élèves.");
+    p("1. Les documents élèves dans l'ordre d'utilisation, puis le document professeur (corrigés, synthèse de référence, déroulé), nettement séparé.");
+    p("2. Chaque document est **mis en page selon la charte graphique** ci-dessus : ce n'est pas une réponse de discussion. Pas de phrase d'introduction ni de conclusion autour des documents.");
   }
-  if(val("ia")==="Claude") p("Si possible, produis le livrable dans un artefact.");
-  if(val("ia")==="ChatGPT") p("Si possible, utilise Canvas pour le livrable.");
+  const ia = val("ia");
+  if(ia==="Claude") p("Produis chaque document dans un **artefact** distinct (HTML mis en page pour les documents, HTML interactif pour les jeux et applications).");
+  else if(ia==="ChatGPT") p("Produis chaque document dans **Canvas**, en HTML + CSS mis en page (pas en Markdown).");
+  else if(ia==="Gemini") p("Produis chaque document dans **Canvas**, en HTML + CSS mis en page (pas en Markdown).");
+  else if(T && T.doc) p("Si ton interface propose un espace de document (artefact, Canvas), utilise-le ; sinon, livre le code HTML complet de chaque document.");
   p("");
   p("## Avant de répondre, vérifie que");
   p("- tout le contenu juridique et économique est exact et à jour (droit français en vigueur) ;");
   p("- chaque activité est reliée à une compétence citée plus haut ;");
   if(RES.length) p("- le contenu respecte les ressources de référence fournies, selon la consigne d'utilisation ;");
   p("- le vocabulaire est accessible à des élèves de lycée professionnel ;");
-  p("- la durée annoncée est réaliste.");
+  p("- la durée annoncée est réaliste ;");
+  if($("#diffOn").checked) p("- chaque activité existe bien dans tous les degrés annoncés, avec ses coups de pouce et son « Pour aller plus loin » ;");
+  if(T && (T.doc || T.inter)) p("- seules les couleurs imposées sont utilisées et la mise en page ne ressemble pas à une réponse de discussion.");
   p("Si une information te manque, fais une hypothèse raisonnable, signale-la en une ligne, puis produis le livrable complet sans t'arrêter.");
   return L.join("\n");
+}
+function degresList(){
+  return /^2/.test(val("degres")) ? ["Degré 1","Degré 2"] : ["Degré 1","Degré 2","Degré 3"];
+}
+function diffSection(p, type, T){
+  if(!$("#diffOn").checked) return;
+  const difs = checked("dif"), adapt = checked("adapt");
+  const has = r => difs.some(a=>r.test(a));
+  const deg = degresList(), n = deg.length;
+  const papierEsc = type==="escape" && /Papier/.test(val("escFormat"));
+  const inter = T && T.inter && !papierEsc;
+  p(""); p("## Différenciation (obligatoire)");
+  p(`Le support est différencié en **${n} degrés de difficulté** (${deg.join(", ")}). Dans les documents élèves, parle toujours de « degré » et jamais de « niveau » ; repère chaque degré par un petit pictogramme sobre (●○○, ●●○, ●●●). Les compétences visées sont les mêmes à tous les degrés : seul l'étayage change.`);
+  if(has(/Aide dégressive/)) p(`**Aide dégressive** : plus l'élève avance, moins il est aidé. ${n===3?"Degré 1 : exemple résolu, amorces de réponse et mots-clés fournis. Degré 2 : rappel de méthode, aide sur demande. Degré 3 : aucune aide, situation plus complexe et justification attendue.":"Degré 1 : exemple résolu et amorces de réponse. Degré 2 : aucune aide, justification attendue."}`);
+  if(!type){ p("Applique ces principes au support choisi."); }
+  else if(type==="app"){
+    p("**Dans l'application :**");
+    if(has(/onglets/)) p(`- Navigation par **onglets d'étapes** : ${deg.map((d,i)=>`« Étape ${i+1} »`).join(", ")}${has(/aller plus loin/)?", puis « Pour aller plus loin »":""}. Chaque onglet affiche son statut d'aide : ${n===3?"« Aide complète », « Aide sur demande », « Sans aide »":"« Aide complète », « Sans aide »"}. Une étape se débloque quand la précédente est réussie (l'enseignant peut tout débloquer depuis son espace).`);
+    if(has(/Coup de pouce/)) p("- Bouton « Coup de pouce » : indices progressifs (1 puis 2), disponible seulement dans les étapes où l'aide est prévue ; il ne donne jamais la réponse.");
+    if(has(/aller plus loin/)) p("- Onglet « Pour aller plus loin » : un défi plus complexe ou une situation professionnelle nouvelle, sans aide, pour les élèves qui ont fini.");
+    if(has(/choisi par l'élève/)) p("- Au démarrage, l'élève choisit son degré de départ ; il peut monter ou redescendre à tout moment.");
+  } else if(type==="jeu"){
+    p("**Dans le jeu :**");
+    p(`- Le jeu propose ${n} séries de questions, une par degré, dans le tableau de données (champ \`degre\`).`);
+    if(has(/onglets/)) p(`- Les séries sont présentées comme des étapes successives (${deg.map((d,i)=>`Étape ${i+1}`).join(" → ")}), affichées dans une barre de progression.`);
+    if(has(/Coup de pouce/)) p("- Bouton « Coup de pouce » sur chaque question des premiers degrés (indice progressif, jamais la réponse) ; au dernier degré, plus de coup de pouce. En mode évaluation, chaque indice utilisé est comptabilisé.");
+    if(has(/aller plus loin/)) p("- Un défi « Pour aller plus loin » se débloque à la fin pour les plus rapides.");
+    if(has(/choisi par l'élève/)) p("- Au démarrage, l'élève choisit son degré de départ.");
+  } else if(type==="escape"){
+    p("**Dans l'escape game :**");
+    p(`- Les énigmes sont de difficulté croissante (${deg.join(" → ")}).`);
+    if(has(/Coup de pouce/)) p(papierEsc ? "- Enveloppes « Coup de pouce » numérotées par énigme, plus nombreuses pour les premières énigmes que pour les dernières." : "- Bouton « Coup de pouce » par énigme, avec moins d'indices disponibles à mesure qu'on progresse.");
+    if(has(/aller plus loin/)) p("- Une énigme bonus « Pour aller plus loin » pour les équipes les plus rapides.");
+  } else {
+    p("**Dans les documents :**");
+    p(`- Chaque activité (ou chaque exercice) est déclinée en ${n} degrés repérés par le pictogramme, sur la même page ou en fiches séparées, avec le même corrigé de référence.`);
+    if(type==="seance") p("- Dans la séance, chaque phase de travail précise ce que fait un élève au degré 1, au degré 2" + (n===3?" et au degré 3.":"."));
+    if(has(/onglets/)) p(`- Les activités sont organisées en étapes numérotées (Étape 1, Étape 2${n===3?", Étape 3":""}) qui suivent les degrés.`);
+    if(has(/Coup de pouce/)) p("- Encadrés « Coup de pouce » (indices progressifs, amorces de réponse) placés en fin de document ou en cartes à découper, signalés par un pictogramme ; plus nombreux au degré 1, absents au dernier degré.");
+    if(has(/aller plus loin/)) p("- Encadré « Pour aller plus loin » après les activités : une tâche plus complexe ou une ouverture professionnelle pour les élèves qui ont fini.");
+    if(has(/choisi par l'élève/)) p("- L'élève choisit son degré de départ et peut changer en cours de route ; prévois une ligne « J'ai travaillé au degré … » en haut de la fiche.");
+    p("- Sur le document professeur : un tableau récapitulatif activité × degré (consigne, aide fournie, production attendue).");
+  }
+  if(adapt.length){
+    p(""); p("**Profils d'élèves à prendre en compte :**");
+    const hasA = r => adapt.some(a=>r.test(a));
+    if(hasA(/DYS/)) p(inter ? "- Bouton « Confort de lecture » : police plus grande, interlignage 1,5, police adaptée aux DYS, pas de texte justifié ni en italique." : "- Version adaptée DYS : police sans empattement 14 pt, interlignage 1,5, une consigne par ligne, consignes numérotées, mots-clés en gras, pas de texte justifié.");
+    if(hasA(/Allophones/)) p(inter ? "- Lexique accessible à tout moment (mot → définition simple), phrases courtes au présent." : "- Lexique en encadré et consignes reformulées simplement.");
+    if(hasA(/Temps majoré/)) p(inter ? "- Option « Temps majoré » qui multiplie le minuteur par 1,33 (ou le supprime)." : "- Repère des exercices facultatifs pour les élèves bénéficiant d'un temps majoré (même note possible sans eux).");
+    if(hasA(/voix haute/)) p(inter ? "- Bouton de lecture audio sur chaque consigne, par la synthèse vocale du navigateur (`speechSynthesis`, voix française), qui fonctionne hors ligne." : "- Consignes rédigées pour être lues à voix haute (phrases courtes, une action par phrase).");
+    if(hasA(/binôme/)) p(inter ? "- Mode binôme : deux prénoms à la saisie, un résultat commun." : "- Rôles précisés pour le travail en binôme ou le tutorat (qui lit, qui écrit, qui vérifie).");
+    if(hasA(/PFMP/)) p("- Au moins une situation tirée de l'expérience de PFMP des élèves.");
+  }
+  if(inter && checked("dash").length) p("- Le tableau de bord enseignant indique, pour chaque élève, le degré ou l'étape atteint, le nombre de coups de pouce utilisés et les aménagements activés.");
+}
+function charteColors(){
+  const ch = val("charte");
+  if(/personnalisées/.test(ch)) return {nom:"Couleurs personnalisées", c1:val("dcol1"), c2:val("dcol2"), desc:"couleurs choisies par l'enseignant"};
+  if(/Seconde/.test(ch) && !/Automatique/.test(ch)) return CHARTES.seconde;
+  if(/Première/.test(ch) && !/Automatique/.test(ch)) return CHARTES.premiere;
+  return /Seconde/.test(val("niveau")) ? CHARTES.seconde : CHARTES.premiere;
+}
+function charteSection(p){
+  const c = charteColors(), fmt = val("format"), opts = checked("dopt");
+  p("## Charte graphique (à respecter strictement)");
+  p(`**${c.nom}** — ${c.desc}. Ambiance : ${val("style").toLowerCase()}. Format : ${fmt}.`);
+  p("");
+  p("**Couleurs** — uniquement celles-ci :");
+  p(`- \`${c.c1}\` pour les titres, les numéros d'activité et les contours d'encadrés ;`);
+  p(`- \`${c.c2}\` pour les filets, les pastilles et les accents ;`);
+  p("- texte en `#1A1A1A`, fond blanc, gris `#6B6B6B` pour les mentions secondaires ;");
+  if(checked("meth").some(m=>/Puzzle/.test(m))) p("- en méthode puzzle seulement : couleurs des groupes d'experts (A rouge `#C0392B`, B bleu `#2C6FB7`, C vert `#2E8B57`, D jaune `#C9A000`) pour les filets et pastilles, toujours accompagnées de la lettre ;");
+  p("- **aucun aplat de couleur** : encadrés à fond blanc, contour fin et filet gauche épais ; mise en page économe en encre, lisible en photocopie noir et blanc.");
+  p("");
+  p("**Typographie et mise en page** :");
+  p("- une seule famille sans empattement (Arial, Calibri ou Atkinson Hyperlegible), corps 11 à 12 pt, interligne 1,3 ; titres en couleur principale, en gras, sans majuscules partout ;");
+  p("- en-tête de chaque document : titre de la séance en majuscules, puis une ligne `DATE : ……  CLASSE : ……  NOM : ……` ;");
+  p("- encadré « Objectifs » (3 au maximum, verbes d'action à l'infinitif) puis, si des CPS sont prévues, encadré « Mes CPS en jeu aujourd'hui » ;");
+  p("- consignes dans des encadrés numérotés, verbe d'action en gras, une consigne par ligne ; zones de réponse en lignes pointillées de hauteur suffisante pour écrire à la main ;");
+  p("- tableaux à filets fins, en-têtes en couleur principale (texte coloré, pas de fond) ; grilles d'auto-évaluation en page paysage si elles ont 8 colonnes ;");
+  p("- format A4 prêt à photocopier en recto-verso, marges de 15 mm, saut de page entre deux documents, pied de page avec le numéro de page.");
+  if(opts.length){ p(""); p("**Éléments à inclure** :"); opts.forEach(o=>p(`- ${o}`)); }
+  p("");
+  p("**À éviter absolument** (style « réponse de chatbot ») : émojis dans les titres ou le texte, listes à puces en cascade, gras sur chaque ligne, séparateurs `---`, titres à rallonge, phrases du type « Voici… » ou « N'hésitez pas… ». Les documents ressources sont rédigés en **texte suivi**, comme un vrai document professionnel, pas en puces.");
+  p("");
+  if(/HTML/.test(fmt)) p(`**Rendu technique** : un document HTML autonome par support, avec une feuille de style intégrée qui déclare \`:root{--titre:${c.c1};--accent:${c.c2}}\` et n'utilise que ces variables pour la couleur, \`@page { size: A4; margin: 15mm }\`, \`break-before: page\` entre les documents, et une mise en page identique à l'écran et à l'impression.`);
+  else if(/Word|Google Docs/.test(fmt)) p(`**Rendu technique** : styles « Titre 1 » et « Titre 2 » en \`${c.c1}\`, encadrés en tableaux à une cellule avec bordure \`${c.c1}\` et filet gauche \`${c.c2}\`, sans trame de fond.`);
+  else p(`**Rendu technique** : diapositives à fond blanc, titres en \`${c.c1}\`, filet d'accent en \`${c.c2}\`, une idée par diapositive, 30 mots au maximum par diapositive.`);
+  p("");
+}
+function grillesSection(p, grilles, type, T){
+  p("## Grilles d'évaluation et compétences psychosociales");
+  const inter = T && T.inter && !(type==="escape" && /Papier/.test(val("escFormat")));
+  if(grilles.includes("Tableau des CPS (élève et professeur)")){
+    p("### Tableau des CPS (référentiel Santé publique France)");
+    const c = {};
+    document.querySelectorAll('input.comp[id^="cps-"]:checked').forEach(i=>{ const cat = i.closest("details").querySelector("summary").childNodes[0].textContent; (c[cat] ||= []).push(i.value); });
+    const cats = Object.entries(c);
+    if(cats.length){ p("CPS travaillées (code officiel, à reprendre à l'identique partout) :"); cats.forEach(([k,items])=>p(`- **${k}** : ${items.join(" ; ")}`)); }
+    else p("Choisis 2 à 4 CPS du référentiel Santé publique France (codes C1 à C8, E1 à E6, S1 à S7) réellement mobilisées par l'activité.");
+    p(inter ? "- **Côté élève** : sur l'écran d'accueil, un encadré « Mes CPS en jeu aujourd'hui » (code, catégorie en toutes lettres, phrase observable à la première personne) ; sur l'écran de fin, une mini auto-évaluation de ces CPS (4 degrés : Je débute, Je progresse, Je réussis, Je maîtrise très bien), enregistrée avec le résultat." : "- **Côté élève** : en page 1, un encadré « Mes CPS en jeu aujourd'hui » : pour chaque CPS, son code, sa catégorie en toutes lettres et une phrase observable à la première personne (ex. « S4 — Sociale — J'aide un camarade qui bloque sans faire à sa place »).");
+    p("- **Côté professeur** : une grille d'observation, une ligne par élève, une colonne par CPS (intitulé officiel, catégorie, un indicateur observable dans cette activité), cases ++ · + · − · −− et une colonne commentaire.");
+    p("- Rigueur, curiosité ou vigilance ne sont pas des CPS : ne les mets pas dans ce tableau.");
+  }
+  if(grilles.includes("Grille d'auto-évaluation élève")){
+    p("### Auto-évaluation élève");
+    if(/8 colonnes/.test(val("autoFormat"))){
+      p("Tableau à 8 colonnes, à l'identique : `Compétences attendues | Je débute (1) | Je progresse (2) | Je réussis (3) | Je maîtrise très bien (4) | Je me situe ✔ | Ce que je dois améliorer | Avis du professeur`.");
+      p(`- Deux volets, dans cet ordre : ${grilles.includes("Tableau des CPS (élève et professeur)")?"**volet 1 — mes CPS** (les CPS ci-dessus, dont une ligne sur la coopération si l'activité est en groupe), puis ":""}**volet ${grilles.includes("Tableau des CPS (élève et professeur)")?"2":"1"} — les compétences du référentiel** réellement travaillées.`);
+      p("- 8 à 12 lignes au total ; descripteurs concrets à la première personne ; on passe du niveau 3 au niveau 4 par un **élément supplémentaire**, jamais par un adverbe.");
+    } else p(`Format : ${val("autoFormat")}. Formule chaque critère en « Je sais… / Je suis capable de… », en lien direct avec les compétences visées (5 à 8 critères), et ajoute une ligne « Ce que je dois retravailler ».`);
+  }
+  if(grilles.includes("Grille d'évaluation des compétences du référentiel")) p("### Compétences du référentiel (professeur)\nTableau : compétence, critères d'évaluation, indicateurs de réussite observables, niveaux de maîtrise (1 à 4).");
+  if(grilles.includes("Barème détaillé")) p("### Barème\nBarème détaillé par question, total sur 20.");
+  p("");
 }
 function articleType(t){
   return {jeu:"un jeu éducatif",app:"une application pédagogique",escape:"un escape game pédagogique",seance:"une séance de cours ludique",cours:"un support de cours",exos:"une fiche d'exercices",td:"un TD / étude de cas",eval:"une évaluation"}[t];
@@ -936,7 +1032,9 @@ function syncUI(){
   $("#c-dash").hidden = !checked("dash").length;
   const g = checked("grille");
   $("#c-auto").hidden = !g.includes("Grille d'auto-évaluation élève");
-  $("#c-cps").hidden = !g.includes("Grille enseignant d'observation des CPS");
+  $("#c-cps").hidden = !g.includes("Tableau des CPS (élève et professeur)");
+  $("#c-diffon").hidden = !$("#diffOn").checked;
+  $("#c-dcol").hidden = !/personnalisées/.test(val("charte"));
   document.querySelectorAll("[data-count]").forEach(c=>{
     const n = c.closest("details").querySelectorAll("input.comp:checked").length;
     c.textContent = n ? `${n} cochée${n>1?"s":""}` : "";
@@ -948,7 +1046,8 @@ function syncUI(){
   });
   const pal = [val("col1"),val("col2"),val("col3")].join().toLowerCase();
   document.querySelectorAll('[data-pal="pal"]').forEach(b=>b.classList.toggle("on", PALETTES[b.dataset.i][1].join().toLowerCase()===pal));
-  document.querySelectorAll('[data-pal="pald"]').forEach(b=>b.classList.toggle("on", +b.dataset.i===palDoc));
+  const dpal = [val("dcol1"),val("dcol2")].join().toLowerCase();
+  document.querySelectorAll('[data-pal="pald"]').forEach(b=>b.classList.toggle("on", PALETTES[b.dataset.i][1].slice(0,2).join().toLowerCase()===dpal));
   const md = generate();
   $("#preview").innerHTML = highlight(md);
   const words = md.split(/\s+/).filter(Boolean).length;
@@ -957,7 +1056,7 @@ function syncUI(){
 }
 
 // ---------- Mémorisation locale ----------
-const KEY = "atelier-prompt-cv-v1";
+const KEY = "atelier-prompt-cv-v2";
 function snapshot(){
   const s = {palDoc};
   document.querySelectorAll("#f input, #f select, #f textarea").forEach(el=>{
@@ -987,7 +1086,15 @@ function clearAll(){
   $("#duree").value="1 h"; $("#difficulte").value="Intermédiaire"; $("#nbItems").value=12; $("#escEnigmes").value=5;
   $("#timerVal").value="30 secondes par question";
   $("#col1").value="#0b6e5f"; $("#col2").value="#f2b632"; $("#col3").value="#f7faf9"; palDoc=0;
+  $("#dcol1").value="#007a55"; $("#dcol2").value="#00c27c";
   document.querySelectorAll("details.menu").forEach(d=>d.open=false);
+  applyDefaults();
+}
+function applyDefaults(){
+  $("#diffOn").checked = true;
+  ["« Coup de pouce » pour les élèves en difficulté","« Pour aller plus loin » pour ceux qui vont vite","Aide dégressive : plus l'élève avance, moins il y a d'aide","Étapes en onglets (Étape 1, Étape 2, Étape 3…)"].forEach(v=>byValue("dif",v));
+  byValue("grille","Tableau des CPS (élève et professeur)");
+  byValue("grille","Grille d'auto-évaluation élève");
 }
 function loadExample(){
   clearAll();
@@ -1008,7 +1115,6 @@ function loadExample(){
   $("#mode").value = "Les deux (choix au lancement)";
   ["Correction immédiate expliquée","Questions et réponses mélangées","Saisie du prénom au démarrage","Écran récapitulatif des erreurs","Adapté au téléphone et à la tablette"].forEach(v=>byValue("iopt",v));
   ["Tableau de bord enseignant","Export CSV des résultats","Statistiques par question (taux de réussite)"].forEach(v=>byValue("dash",v));
-  byValue("grille","Grille d'auto-évaluation élève"); byValue("grille","Grille enseignant d'observation des CPS");
   setCheck("cps-2-0-0"); setCheck("cps-2-0-1"); setCheck("cps-1-2-0");
   syncUI();
 }
@@ -1025,7 +1131,7 @@ document.addEventListener("click", e=>{
   const b = e.target.closest("[data-pal]"); if(!b) return;
   const c = PALETTES[b.dataset.i][1];
   if(b.dataset.pal==="pal"){ $("#col1").value=c[0]; $("#col2").value=c[1]; $("#col3").value=c[2]; }
-  else palDoc = +b.dataset.i;
+  else { palDoc = +b.dataset.i; $("#dcol1").value=c[0]; $("#dcol2").value=c[1]; }
   syncUI();
 });
 $("#btn-example").addEventListener("click", loadExample);
