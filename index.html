@@ -131,6 +131,29 @@ details.menu>summary .count{margin-left:auto;font-family:var(--f-mono);font-size
 .panel pre .d{color:var(--code-dim)}
 .panel .copy{background:var(--mark);border-color:var(--mark);color:#16211F}
 .toast{font-size:13px;color:var(--mark);min-height:1em}
+.panel-h>div:last-child{flex-wrap:wrap;justify-content:flex-end}.panel-h .btn{white-space:nowrap}
+.panel-h .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.reader{background:var(--surface);color:var(--fg);padding:18px 20px 24px;max-height:calc(100vh - 220px);min-height:320px;overflow:auto;font-size:15px;line-height:1.6}
+@media (max-width:980px){.reader{max-height:70vh;padding:14px 16px 20px}}
+.reader-top{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;background:var(--sunk);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:13.5px}
+.reader-top p{margin:0;flex:1 1 240px}
+.rd h2{font-family:var(--f-display);font-size:20px;line-height:1.3;margin:0 0 6px}
+.rd h3{font-family:var(--f-display);font-size:17px;margin:22px 0 6px;padding-top:12px;border-top:1px solid var(--line)}
+.rd h4{font-size:15px;margin:14px 0 4px}
+.rd p{margin:6px 0}
+.rd .why{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:6px;padding:6px 10px;margin:6px 0 10px;font-size:13.5px}
+.rd .why b{color:var(--accent)}
+.rd .li{position:relative;padding-left:calc(var(--lvl,0) * 18px + 18px);margin:3px 0}
+.rd .li::before{content:"•";position:absolute;left:calc(var(--lvl,0) * 18px + 4px);color:var(--accent);font-weight:700}
+.rd .li.num::before{content:attr(data-n);left:calc(var(--lvl,0) * 18px)}
+.rd .note{color:var(--muted);font-style:italic}
+.rd .callout{border-left:3px solid var(--mark);background:var(--sunk);padding:6px 10px;border-radius:6px;margin:8px 0}
+.rd code{font-family:var(--f-mono);font-size:.88em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+.rd .sw{display:inline-block;width:.9em;height:.9em;border-radius:3px;vertical-align:-1px;margin-right:4px;border:1px solid var(--line)}
+.rd a{color:var(--accent);word-break:break-word}
+.rd details{border:1px solid var(--line);border-radius:8px;margin:8px 0;background:var(--bg)}
+.rd details summary{cursor:pointer;padding:8px 10px;font-weight:700;font-size:14px}
+.rd details div{padding:0 12px 10px;white-space:pre-wrap;font-size:13.5px;max-height:300px;overflow:auto}
 .tips{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;font-size:14px}
 .tips h3{margin:0 0 6px;font-family:var(--f-display);font-size:15px}
 .tips ol{margin:0;padding-left:20px}
@@ -385,14 +408,22 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
   <div class="panel">
     <div class="panel-h">
       <div><h2>Votre prompt</h2><div class="meta" id="meta">0 mot</div><div class="warn" id="warn" role="status" hidden></div></div>
-      <div style="display:flex;gap:8px;align-items:center"><span class="toast" id="toast" role="status"></span><button class="btn" id="btn-md" type="button" title="Enregistrer le prompt dans un fichier Markdown (.md)">Télécharger .md</button><button class="btn copy" id="btn-copy" type="button">Copier le prompt</button></div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="toast" id="toast" role="status"></span><button class="btn" id="btn-read" type="button" aria-pressed="false" title="Afficher le prompt mis en forme, avec l'explication de chaque partie">Lire en clair</button><button class="btn" id="btn-md" type="button" title="Enregistrer le prompt dans un fichier Markdown (.md)">Télécharger .md</button><button class="btn copy" id="btn-copy" type="button">Copier le prompt</button></div>
     </div>
     <pre id="preview" tabindex="0" aria-label="Prompt Markdown généré"></pre>
+    <div id="reader" class="reader" tabindex="0" aria-label="Prompt en version lisible" hidden>
+      <div class="reader-top">
+        <p><b>Version lisible du prompt.</b> Le contenu est le même que la version pour l'IA, sans les symboles de mise en forme. Les encadrés verts expliquent à quoi sert chaque partie. Pour utiliser le prompt, copiez toujours la version pour l'IA avec le bouton « Copier le prompt ».</p>
+        <button class="btn" id="btn-readdl" type="button">Télécharger cette version lisible</button>
+      </div>
+      <div id="readerBody"></div>
+    </div>
   </div>
   <div class="tips">
     <h3>Mode d'emploi</h3>
     <ol>
       <li>Cochez les compétences et réglez les options : le prompt se met à jour en direct.</li>
+      <li>Pour comprendre le prompt, cliquez sur <strong>Lire en clair</strong> : il s'affiche mis en forme, avec l'explication de chaque partie.</li>
       <li>Cliquez sur <strong>Copier le prompt</strong>, puis collez-le dans l'IA de votre choix. Ou cliquez sur <strong>Télécharger .md</strong> pour garder le prompt dans un fichier (à joindre à l'IA, à archiver ou à partager avec un collègue).</li>
       <li>Pour un jeu ou une application, demandez un <strong>fichier HTML unique</strong> : enregistrez-le et ouvrez-le dans un navigateur, ou déposez-le sur l'ENT.</li>
       <li>Relisez toujours le contenu produit : l'IA peut se tromper sur le droit ou les chiffres.</li>
@@ -1168,6 +1199,70 @@ function articleType(t){
   return {jeu:"un jeu éducatif",app:"une application pédagogique",escape:"un escape game pédagogique",seance:"une séance de cours ludique",cours:"un support de cours",exos:"une fiche d'exercices",td:"un TD / étude de cas",eval:"une évaluation"}[t];
 }
 
+// ---------- Version lisible ----------
+const WHY = [
+  [/^Mission/, "La phrase d'ouverture : ce que l'on demande à l'IA, en une ligne."],
+  [/^Ton rôle/, "On dit à l'IA qui elle doit être. Elle adopte alors le vocabulaire et les exigences d'un enseignant de lycée professionnel."],
+  [/^Contexte/, "Les informations de base sur la classe : niveau, notion, durée. L'IA s'en sert pour adapter la difficulté et les exemples."],
+  [/^Ressources/, "Vos documents déposés. L'IA doit construire le support à partir d'eux et dire d'où vient chaque activité."],
+  [/^Compétences du référentiel/, "Les compétences que vous avez cochées, recopiées du référentiel officiel. Chaque activité doit s'y rattacher."],
+  [/^Méthode pédagogique/, "Les étapes officielles de la méthode choisie, avec leur source (éduscol, CSEN). L'IA doit les suivre dans l'ordre."],
+  [/^Différenciation/, "Comment adapter le support aux élèves : degrés de difficulté, « Coup de pouce », « Pour aller plus loin »."],
+  [/^Réglages du jeu/, "Les options du jeu ou de l'application : correction, sons, équipes, badges…"],
+  [/^Tableau de bord/, "Comment vous récupérez les résultats des élèves, même hors connexion."],
+  [/^Contraintes techniques/, "Des règles techniques pour que le fichier fonctionne partout : un seul fichier, sans Internet, sur téléphone comme sur ordinateur."],
+  [/^Charte graphique/, "Les couleurs et la mise en page imposées, pour que les documents ressemblent à vos supports habituels."],
+  [/^Grilles/, "Les grilles d'évaluation et le tableau des compétences psychosociales (CPS) demandés."],
+  [/^Livrable/, "La liste précise de ce que l'IA doit rendre."],
+  [/^Contraintes de réalisation|^Format/, "La façon dont l'IA doit présenter sa réponse."],
+  [/^Consignes particulières/, "Vos consignes personnelles, ajoutées telles quelles."],
+  [/^Avant de répondre/, "Une liste de contrôle que l'IA doit vérifier avant de vous rendre son travail."]
+];
+function inlineMd(t){
+  return esc(t)
+    .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/`([^`]+)`/g,(m,c)=>/^#[0-9a-f]{6}$/i.test(c)?`<span class="sw" style="background:${c}"></span><code>${c}</code>`:`<code>${c}</code>`)
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/(^|[\s(])_([^_]+)_(?=$|[\s).,;:])/g,'$1<em>$2</em>');
+}
+function readableHTML(md){
+  const out = []; const lines = md.split("\n");
+  for(let i=0;i<lines.length;i++){
+    const l = lines[i];
+    const doc = l.match(/^<document nom="(.*)">$/);
+    if(doc){
+      const buf = []; i++;
+      while(i<lines.length && lines[i]!=="</document>"){ buf.push(lines[i]); i++; }
+      const txt = buf.join("\n");
+      out.push(`<details><summary>Texte de la ressource « ${esc(doc[1])} » (${txt.length.toLocaleString("fr-FR")} caractères) : cliquer pour l'afficher</summary><div>${esc(txt)}</div></details>`);
+      continue;
+    }
+    if(!l.trim()) continue;
+    let m;
+    if((m = l.match(/^(#{1,3}) (.*)$/))){
+      const lvl = m[1].length, title = m[2].replace(/^Mission : /,"");
+      out.push(`<h${lvl+1}>${inlineMd(lvl===1?m[2]:title)}</h${lvl+1}>`);
+      if(lvl<=2){ const w = WHY.find(([re])=>re.test(m[2])); if(w) out.push(`<div class="why"><b>À quoi sert cette partie ?</b> ${esc(w[1])}</div>`); }
+      continue;
+    }
+    if((m = l.match(/^( *)- (.*)$/))){ out.push(`<div class="li" style="--lvl:${Math.floor(m[1].length/2)}">${inlineMd(m[2])}</div>`); continue; }
+    if((m = l.match(/^( *)(\d+)\. (.*)$/))){ out.push(`<div class="li num" data-n="${m[2]}." style="--lvl:${Math.floor(m[1].length/2)}">${inlineMd(m[3])}</div>`); continue; }
+    if((m = l.match(/^> ?(.*)$/))){ out.push(`<div class="callout">${inlineMd(m[1])}</div>`); continue; }
+    if(/^_.*_$/.test(l.trim())){ out.push(`<p class="note">${inlineMd(l.trim().slice(1,-1))}</p>`); continue; }
+    out.push(`<p>${inlineMd(l)}</p>`);
+  }
+  return `<div class="rd">${out.join("")}</div>`;
+}
+let readMode = false;
+function renderReader(md){ if(readMode) $("#readerBody").innerHTML = readableHTML(md); }
+function setReadMode(on){
+  readMode = on;
+  $("#btn-read").setAttribute("aria-pressed", on ? "true" : "false");
+  $("#btn-read").textContent = on ? "Version pour l'IA" : "Lire en clair";
+  $("#preview").hidden = on; $("#reader").hidden = !on;
+  if(on) renderReader(generate());
+}
+
 // ---------- Affichage ----------
 function highlight(md){
   return md.split("\n").map(l=>{
@@ -1218,6 +1313,7 @@ function syncUI(){
   $("#warn").hidden = !warn.length;
   const md = generate();
   $("#preview").innerHTML = highlight(md);
+  renderReader(md);
   const words = md.split(/\s+/).filter(Boolean).length;
   $("#meta").textContent = `${words} mots · Markdown`;
   save();
@@ -1310,6 +1406,31 @@ $("#btn-copy").addEventListener("click", ()=>{
   const done = msg=>{ $("#toast").textContent = msg; setTimeout(()=>$("#toast").textContent="", 2600); };
   const fallback = ()=>{ const r=document.createRange(); r.selectNodeContents($("#preview")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); done("Texte sélectionné : Cmd/Ctrl + C"); };
   try{ navigator.clipboard.writeText(md).then(()=>done("Prompt copié"), fallback); }catch(err){ fallback(); }
+});
+$("#btn-read").addEventListener("click", ()=>setReadMode(!readMode));
+$("#btn-readdl").addEventListener("click", ()=>{
+  const md = generate();
+  const done = msg=>{ $("#toast").textContent = msg; setTimeout(()=>$("#toast").textContent="", 3200); };
+  const css = `body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;max-width:820px;margin:32px auto;padding:0 20px;color:#16211F;background:#fff;line-height:1.6;font-size:15px}
+.intro{background:#EEF2F1;border-radius:8px;padding:10px 14px;font-size:14px}
+.rd h2{font-size:22px;margin:18px 0 6px}.rd h3{font-size:18px;margin:24px 0 6px;padding-top:12px;border-top:1px solid #C9D3D0}.rd h4{font-size:15px;margin:14px 0 4px}.rd p{margin:6px 0}
+.rd .why{background:#D3EBE5;border-left:4px solid #0B6E5F;border-radius:6px;padding:6px 10px;margin:6px 0 10px;font-size:14px}.rd .why b{color:#0B6E5F}
+.rd .li{position:relative;padding-left:calc(var(--lvl,0) * 18px + 18px);margin:3px 0}.rd .li::before{content:"•";position:absolute;left:calc(var(--lvl,0) * 18px + 4px);color:#0B6E5F;font-weight:700}.rd .li.num::before{content:attr(data-n);left:calc(var(--lvl,0) * 18px)}
+.rd .note{color:#56635F;font-style:italic}.rd .callout{border-left:3px solid #C98A00;background:#F4F6F5;padding:6px 10px;border-radius:6px;margin:8px 0}
+.rd code{font-family:ui-monospace,Menlo,monospace;font-size:.88em;background:#EEF2F1;padding:1px 5px;border-radius:4px}.rd .sw{display:inline-block;width:.9em;height:.9em;border-radius:3px;vertical-align:-1px;margin-right:4px;border:1px solid #C9D3D0}
+.rd a{color:#0B6E5F}.rd details{border:1px solid #C9D3D0;border-radius:8px;margin:8px 0}.rd details summary{cursor:pointer;padding:8px 10px;font-weight:700}.rd details div{padding:0 12px 10px;white-space:pre-wrap;font-size:14px}
+@media print{.rd details div{max-height:none}}`;
+  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Prompt expliqué</title><style>${css}</style></head><body><p class="intro"><b>Prompt expliqué, version lisible.</b> Ce document sert à comprendre comment le prompt est construit. Pour l'utiliser dans une IA, copiez la version pour l'IA depuis l'Atelier Prompt.</p>${readableHTML(md)}</body></html>`;
+  const slug = (val("theme") || (document.querySelector('input[name=type]:checked')||{}).value || "prompt")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50) || "prompt";
+  const name = `prompt-lisible-${slug}-${new Date().toISOString().slice(0,10)}.html`;
+  try{
+    const url = URL.createObjectURL(new Blob([html],{type:"text/html;charset=utf-8"}));
+    const a = Object.assign(document.createElement("a"),{href:url,download:name});
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    done(`Fichier ${name} téléchargé`);
+  }catch(err){ done("Téléchargement bloqué par le navigateur"); }
 });
 $("#btn-md").addEventListener("click", ()=>{
   const md = generate();
