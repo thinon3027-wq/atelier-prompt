@@ -75,7 +75,7 @@ details.menu>summary{cursor:pointer;padding:10px 12px;font-weight:700;display:fl
 details.menu>summary::-webkit-details-marker{display:none}
 details.menu>summary::after{content:"▾";color:var(--muted);transition:transform .15s}
 details.menu[open]>summary::after{transform:rotate(180deg)}
-.tuto{padding:0 14px 12px;font-size:14px}.tuto ol{margin:4px 0 10px;padding-left:22px}.tuto p{margin:8px 0}
+.tuto{padding:0 14px 12px;font-size:14px}.tuto ol,.tuto ul{margin:4px 0 10px;padding-left:22px}.tuto li{margin:4px 0}.tuto a{color:var(--accent);word-break:break-word}.tuto p{margin:8px 0}
 details.menu>summary .count{margin-left:auto;font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:600}
 .menu-body{padding:2px 12px 12px}
 .sub{margin:10px 0 4px}
@@ -252,6 +252,13 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
     <legend><b>5</b> Méthode pédagogique</legend>
     <p class="hint">Plusieurs choix possibles : l'IA articulera les méthodes cochées.</p>
     <div class="chips" id="methodes"></div>
+    <details class="menu" id="m-methsrc">
+      <summary>Sources officielles des méthodes</summary>
+      <div class="tuto">
+        <p>Chaque méthode s'appuie sur une ressource du ministère de l'Éducation nationale (éduscol, CSEN). Le prompt transmet à l'IA les étapes à respecter et la source.</p>
+        <ul id="methSrcList"></ul>
+      </div>
+    </details>
   </fieldset>
 
   <fieldset class="step" id="s-diff">
@@ -481,24 +488,124 @@ const TYPES = [
   {id:"eval", t:"Évaluation", s:"sommative ou formative", doc:true}
 ];
 const JEUX = ["Quiz à choix multiples (QCM)","Vrai ou faux chronométré","Mots croisés","Mots mêlés","Memory (paires notion / définition)","Pendu du vocabulaire commercial","Glisser-déposer : classer et associer","Remettre dans l'ordre (étapes de la vente, procédure)","Texte à trous","Jeu du millionnaire (paliers et jokers)","Jeu de l'oie / plateau numérique","Loto / bingo des notions","Dominos question-réponse","Flashcards recto-verso","Roue de la fortune des questions","Qui suis-je ? (devinettes à indices)","Time's Up / Taboo du vocabulaire","Jeu de rôle guidé (simulation client)","Enquête / Cluedo commercial","Battle de questions en équipes (type buzzer)"];
+const SRC = {
+  groupes:{n:"Éduscol – « Travailler en groupes » (ressource mathématiques, démarche transversale)",u:"https://eduscol.education.gouv.fr/sites/default/files/document/travailler-en-groupesmathematiquespdf-91839.pdf"},
+  efran:{n:"Éducation nationale – e-FRAN : l'apprentissage coopératif pour les élèves en difficulté",u:"https://e-fran.education.gouv.fr/utiliser-lapprentissage-cooperatif-pour-faciliter-lapprentissage-chez-les-eleves-en-difficulte/"},
+  stmg:{n:"Éduscol – « Enseigner l'économie » (ressource STMG droit-économie)",u:"https://eduscol.education.gouv.fr/sites/default/files/document/ra20lyceet1-tstmgdroitecoenseigner-economie1298737pdf-84762.pdf"},
+  csen:{n:"Conseil scientifique de l'Éducation nationale (CSEN) – « Mes clés pour comprendre l'enseignement explicite »",u:"https://www.csen.education.gouv.fr/publications/mes-cles-pour-comprendre-lenseignement-explicite/"},
+  primabord:{n:"Éduscol Prim à bord – « La classe inversée »",u:"https://primabord.eduscol.education.fr/la-classe-inversee"},
+  diffmaths:{n:"Éduscol – « La différenciation pédagogique » (ressource cycle 4)",u:"https://eduscol.education.gouv.fr/sites/default/files/document/ra16c4mathladifferentiationpedagogique547934pdf-77565.pdf"},
+  cdo:{n:"Éduscol – Vade-mecum « La réalisation du chef-d'œuvre » (voie professionnelle)",u:"https://eduscol.education.gouv.fr/sites/default/files/document/vademecum-la-realisation-du-chef-d-oeuvre-68043.pdf"},
+  coint:{n:"Éduscol – Vade-mecum « Pratiquer la co-intervention dans la voie professionnelle »",u:"https://eduscol.education.gouv.fr/sites/default/files/document/vademecum-pratiquer-la-co-intervention-dans-la-voie-professionnelle-68040.pdf"},
+  appr:{n:"Éduscol – Vade-mecum « Mettre en œuvre l'apprentissage à l'Éducation nationale » (fiche 5 : différenciation)",u:"https://eduscol.education.gouv.fr/sites/default/files/document/vademecum-mettre-en-oeuvre-l-apprentissage-l-education-nationale-67743.pdf"},
+  ecodroit:{n:"Éduscol – Programmes et ressources en économie-droit, voie professionnelle",u:"https://eduscol.education.gouv.fr/5874/programmes-et-ressources-en-economie-droit-voie-professionnelle"},
+  mondepro:{n:"Éduscol – Ressource « mathématiques et monde économique et professionnel » (définition du jeu de rôle)",u:"https://eduscol.education.fr/document/17212/download"},
+  refmcv:{n:"Éduscol – Référentiel du Bac Pro Métiers du commerce et de la vente",u:"https://referentiels-professionnels.eduscol.education.fr/BacPro_MetCoVe/Annexes_BacPro_MetCoVe.pdf"},
+  dedoub:{n:"Éduscol – Vade-mecum « Classes dédoublées CP-CE1 » (école primaire, mise en garde sur les ateliers)",u:"https://eduscol.education.gouv.fr/sites/default/files/document/vademecum-le-pilotage-des-classes-dedoublees-100-de-reussite-en-cp-et-ce1-67860.pdf"},
+  edunum:{n:"Éduscol – Lettre ÉduNum n° 33 (mai 2023) : jeux sérieux",u:"https://eduscol.education.fr/document/50291/download"},
+  sti:{n:"Éduscol STI – « La démarche d'investigation »",u:"https://sti.eduscol.education.fr/ressources_pedagogiques/la-demarche-dinvestigation"},
+  debat:{n:"Éduscol – Ressource EMC « Le débat (réglé ou argumenté) »",u:"https://eduscol.education.fr/document/20578/download"},
+  carte:{n:"Éduscol STI – « La carte mentale » (ressource enseignants)",u:"https://sti.eduscol.education.fr/sites/eduscol.education.fr.sti/files/ressources/pedagogiques/18156/18156-la-carte-mentale-compresse.pdf"},
+  pfmp:{n:"Éduscol – Vade-mecum orientation voie professionnelle (préparation et exploitation des PFMP)",u:"https://eduscol.education.fr/document/3165/download"}
+};
 const METHODES = [
-  ["Puzzle (jigsaw)","groupes d'experts puis groupes de restitution"],
-  ["Inductive","partir d'exemples concrets pour construire la notion"],
-  ["Déductive","notion d'abord, puis application"],
-  ["Classe inversée","découverte à la maison, approfondissement en classe"],
-  ["Pédagogie de projet","production finale concrète"],
-  ["Apprentissage par problème","résoudre une situation professionnelle"],
-  ["Étude de cas","analyse d'une entreprise réelle ou fictive"],
-  ["Jeu de rôle / simulation","mise en situation vendeur-client"],
-  ["Ateliers tournants","îlots avec activités différentes"],
-  ["Ludopédagogie","apprendre par le jeu"],
-  ["Démarche d'investigation","questionner, chercher, conclure"],
-  ["Travail coopératif","rôles attribués, entraide"],
-  ["Débat argumenté","prises de position et arguments"],
-  ["Carte mentale","structurer et mémoriser"],
-  ["Pédagogie différenciée","parcours selon le niveau"],
-  ["Alternance PFMP","exploiter l'expérience en entreprise"]
+  {t:"Enseignement explicite", s:"5 phases du CSEN : ouverture, modelage, pratique guidée, pratique autonome, clôture", src:["csen"], off:true, steps:[
+    "Ouverture (3 à 5 min) : annoncer l'objectif et réactiver les connaissances préalables",
+    "Modelage (environ 10 min) : l'enseignant montre et pense à voix haute sur des exemples résolus, du simple au complexe, découpés en petites unités",
+    "Pratique guidée (10 à 15 min) : les élèves font avec l'enseignant, qui vérifie la compréhension et corrige aussitôt",
+    "Pratique autonome (15 à 20 min) : les élèves s'exercent seuls sur des tâches proches",
+    "Clôture (5 à 10 min) : faire résumer ce qui a été appris et annoncer la suite"]},
+  {t:"Puzzle (jigsaw)", s:"groupes d'experts puis groupes d'apprentissage où chaque expert apporte sa partie", src:["groupes","efran"], off:true, steps:[
+    "Phase 1, groupes d'experts : chaque groupe étudie une partie différente ; les parties ne sont pas réparties au hasard, mais selon les besoins des élèves",
+    "Phase 2, groupes d'apprentissage : un expert de chaque partie par groupe ; chacun explique sa partie aux autres",
+    "Tâche complexe commune qui ne peut être réussie qu'en utilisant le travail de chaque expert",
+    "Synthèse collective conduite par l'enseignant"]},
+  {t:"Inductive", s:"partir de cas concrets pour construire la notion (choix laissé à l'enseignant)", src:["stmg"], off:true, steps:[
+    "Présenter des exemples concrets ou des documents d'entreprise",
+    "Faire observer, comparer et repérer ce qui est commun",
+    "Faire formuler la notion par les élèves",
+    "Institutionnaliser : l'enseignant valide et fixe la définition dans la trace écrite"],
+    note:"La ressource éduscol rappelle qu'aucune méthode n'est imposée et qu'une démarche purement inductive est difficile à tenir : prévoir un apport de l'enseignant."},
+  {t:"Déductive", s:"notion d'abord, puis exemples et application", src:["stmg"], off:true, steps:[
+    "Exposer la notion et sa définition",
+    "L'illustrer par un ou deux exemples commentés",
+    "Faire appliquer à une situation professionnelle"]},
+  {t:"Classe inversée", s:"découverte courte hors de la classe, activités et aide en classe", src:["primabord","diffmaths"], off:true, steps:[
+    "Préparer un support de découverte court et accessible à tous (prévoir un accès au lycée pour les élèves non équipés)",
+    "Vérifier en début de séance ce qui a été compris",
+    "Consacrer le temps de classe aux activités, à l'aide individuelle et au travail en groupe",
+    "Garder des temps d'explication par l'enseignant, clairement identifiés"],
+    note:"Les ressources éduscol mettent en garde contre les inégalités quand la découverte se fait à la maison et rappellent de ne pas sous-estimer l'explication orale de l'enseignant."},
+  {t:"Pédagogie de projet", s:"production finale concrète, planifiée et présentée (logique du chef-d'œuvre)", src:["cdo"], off:true, steps:[
+    "Définir la production finale et ses destinataires",
+    "Planifier les étapes, les rôles et les échéances",
+    "Suivre l'avancement (points d'étape, carnet de bord)",
+    "Présenter la réalisation et l'évaluer"]},
+  {t:"Co-intervention (situation professionnelle)", s:"situation professionnelle problématisée, deux enseignants (enseignement professionnel + général)", src:["coint"], off:true, steps:[
+    "Partir d'une situation professionnelle problématisée",
+    "Répartir le rôle des deux enseignants pendant la séance",
+    "Faire mobiliser à la fois les savoirs professionnels et ceux de l'enseignement général",
+    "Faire une synthèse commune"]},
+  {t:"Apprentissage par problème", s:"résoudre un problème issu d'une situation professionnelle", src:["coint","appr"], off:true, steps:[
+    "Présenter la situation et le problème à résoudre",
+    "Faire identifier ce que l'on sait et ce qu'il faut chercher",
+    "Laisser chercher (documents, outils), avec aide de l'enseignant",
+    "Mettre en commun les solutions, puis fixer les savoirs"]},
+  {t:"Étude de cas", s:"analyse d'une entreprise réelle ou fictive à partir d'un dossier documentaire", src:["ecodroit","appr"], off:true, steps:[
+    "Présenter l'entreprise et le contexte",
+    "Fournir un dossier documentaire et des questions progressives",
+    "Faire analyser, puis proposer des solutions argumentées",
+    "Corriger et faire le lien avec la notion du programme"]},
+  {t:"Jeu de rôle / simulation", s:"l'élève « entre dans la peau » d'un professionnel (vendeur, client, observateur)", src:["mondepro","refmcv"], off:true, steps:[
+    "Vérifier que les élèves ont les prérequis",
+    "Donner le scénario et les fiches de rôle (vendeur, client, observateur)",
+    "Jouer la scène",
+    "Faire un retour à l'aide d'une grille d'observation"]},
+  {t:"Ateliers tournants", s:"îlots avec activités différentes (pas de ressource officielle dédiée au lycée)", src:["dedoub"], off:false, steps:[
+    "Prévoir des ateliers de même durée avec des consignes autonomes",
+    "Organiser la rotation et un atelier encadré par l'enseignant",
+    "Faire un bilan commun"],
+    note:"Pas de ressource officielle dédiée au lycée. La seule mention trouvée (école primaire) met en garde contre la perte de temps et la dispersion, et privilégie les groupes de besoins."},
+  {t:"Ludopédagogie", s:"jeux sérieux au service d'un objectif d'apprentissage", src:["edunum"], off:true, steps:[
+    "Fixer l'objectif d'apprentissage visé par le jeu",
+    "Faire jouer",
+    "Faire un retour sur ce qui a été appris (débriefing), puis une trace écrite"]},
+  {t:"Démarche d'investigation", s:"situation déclenchante, hypothèses, recherche, conclusion", src:["sti"], off:true, steps:[
+    "Situation déclenchante et question à résoudre",
+    "Hypothèses des élèves",
+    "Investigation (recherche, documents, observation)",
+    "Mise en commun et confrontation",
+    "Structuration des connaissances"]},
+  {t:"Travail coopératif", s:"rôles attribués, entraide, chacun responsable de sa part", src:["groupes","efran"], off:true, steps:[
+    "Constituer des groupes et attribuer des rôles",
+    "Donner une tâche qui demande la contribution de chacun",
+    "Rendre chaque élève responsable de sa part",
+    "Faire un bilan du travail produit et du fonctionnement du groupe"]},
+  {t:"Débat argumenté", s:"débat préparé : recherche, arguments, rôles, bilan", src:["debat"], off:true, steps:[
+    "Poser une question qui fait débat",
+    "Recherche documentaire et préparation des arguments",
+    "Fixer les règles et les rôles (modérateur, secrétaire de séance)",
+    "Débat dans une salle aménagée (en U ou en cercle)",
+    "Bilan réflexif"]},
+  {t:"Carte mentale", s:"représentation visuelle pour organiser, communiquer et mémoriser", src:["carte"], off:true, steps:[
+    "Placer la notion centrale",
+    "Ajouter les branches principales, puis les détails",
+    "Utiliser des mots-clés, des couleurs et des pictogrammes",
+    "S'en servir pour réviser ou présenter"]},
+  {t:"Pédagogie différenciée", s:"mêmes objectifs pour tous, voies différentes pour y arriver", src:["appr","diffmaths"], off:true, steps:[
+    "Fixer un objectif commun à toute la classe",
+    "Repérer les besoins (évaluation diagnostique)",
+    "Proposer des voies différentes : supports, aides, groupes de besoins",
+    "Évaluer l'atteinte de l'objectif commun"]},
+  {t:"Alternance PFMP", s:"préparer, puis exploiter en classe l'expérience vécue en entreprise", src:["pfmp","cdo"], off:true, steps:[
+    "Préparer la période (objectifs, fiches d'observation)",
+    "Recueillir les expériences vécues",
+    "Restituer et analyser en classe",
+    "Relier aux notions et aux compétences du référentiel"]}
 ];
+function methSourcesHTML(){
+  return METHODES.map(m=>`<li><b>${esc(m.t)}</b>${m.off?"":" <em>(pas de ressource officielle dédiée au lycée)</em>"} : ${m.src.map(k=>`<a href="${SRC[k].u}" target="_blank" rel="noopener">${esc(SRC[k].n)}</a>`).join(" ; ")}</li>`).join("");
+}
 const DIFS = ["« Coup de pouce » pour les élèves en difficulté","« Pour aller plus loin » pour ceux qui vont vite","Aide dégressive : plus l'élève avance, moins il y a d'aide","Étapes en onglets (Étape 1, Étape 2, Étape 3…)","Degré choisi par l'élève"];
 const ADAPT = ["Élèves à besoins particuliers (DYS : police lisible, consignes courtes)","Allophones (vocabulaire simplifié + lexique)","Temps majoré (tiers-temps PAP / PPS)","Consignes lues à voix haute (audio)","Travail en binôme ou tutorat entre pairs","Exploitation des PFMP"];
 const INTER_OPTS = ["Correction immédiate expliquée","Questions et réponses mélangées","Étapes qui se débloquent","Effets sonores (désactivables)","Saisie du prénom au démarrage","Écran récapitulatif des erreurs","Adapté au téléphone et à la tablette","Mode équipe (vidéoprojecteur)","Badges et récompenses"];
@@ -556,6 +663,7 @@ function buildPalettes(target, prefix){
 chips("#types", TYPES, "type", "radio", true);
 $("#jeuType").innerHTML = JEUX.map(j=>`<option>${esc(j)}</option>`).join("");
 chips("#methodes", METHODES, "meth");
+$("#methSrcList").innerHTML = methSourcesHTML();
 chips("#adapt", ADAPT, "adapt");
 chips("#difs", DIFS, "dif");
 chips("#interOpts", INTER_OPTS, "iopt");
@@ -758,8 +866,21 @@ function generate(){
 
   p("## Méthode pédagogique");
   if(meths.length){
-    meths.forEach(m=>{ const d = METHODES.find(x=>x[0]===m); p(`- **${m}** : ${d?d[1]:""}`); });
-    p("Décris concrètement comment chaque méthode est mise en œuvre (organisation de la classe, rôle de l'enseignant, rôle des élèves, timing).");
+    p("Respecte les étapes officielles de chaque méthode, dans l'ordre. Elles sont tirées des ressources du ministère de l'Éducation nationale citées ci-dessous.");
+    p("");
+    meths.forEach(m=>{
+      const d = METHODES.find(x=>x.t===m); if(!d){ p(`- **${m}**`); return; }
+      p(`### ${d.t}`);
+      p(`${d.s}.`);
+      d.steps.forEach((st,i)=>p(`${i+1}. ${st}`));
+      if(d.note) p(`> Attention : ${d.note}`);
+      p(`Source : ${d.src.map(k=>`[${SRC[k].n}](${SRC[k].u})`).join(" ; ")}`);
+      p("");
+    });
+    if(T && T.inter) p("Le support produit est numérique : intègre ces étapes dans le déroulé de la séance de la fiche enseignant (avant, pendant et après l'utilisation du support), et dans le support lui-même quand c'est possible.");
+    p("Décris concrètement comment chaque étape est mise en œuvre : organisation de la classe, rôle de l'enseignant, rôle des élèves, durée.");
+    p("Si une étape ne peut pas être appliquée avec ce support, dis-le clairement et propose l'adaptation la plus proche, au lieu de l'omettre.");
+    p("N'ajoute pas d'étape ni de référence officielle qui ne figure pas ici, et n'invente aucune source.");
   } else p("Choisis la démarche la plus adaptée (active, centrée sur une situation professionnelle) et justifie-la en deux phrases.");
   diffSection(p, type, T);
   p("");
