@@ -190,6 +190,8 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
           <option>Seconde Bac Pro famille des métiers de la relation client</option>
           <option>Première Bac Pro MCV</option>
           <option>Terminale Bac Pro MCV</option>
+          <option>1re année CAP Équipier polyvalent du commerce (EPC)</option>
+          <option>2e année CAP Équipier polyvalent du commerce (EPC)</option>
         </select></div>
       <div><label class="f" for="effectif">Effectif</label>
         <input type="text" id="effectif" placeholder="ex. 28 élèves, demi-groupe de 14"></div>
@@ -398,7 +400,7 @@ footer{margin-top:30px;color:var(--muted);font-size:13px}
   </div>
 </aside>
 </div>
-<footer>Sources : Vademecum seconde famille des métiers de la relation client (2019), référentiel Bac Pro Métiers du commerce et de la vente (annexes I), programme d'économie-droit des bacs pro tertiaires, compétences psychosociales (Santé publique France). Vos réglages restent enregistrés dans votre navigateur.</footer>
+<footer>Sources : Vademecum seconde famille des métiers de la relation client (2019), référentiel du CAP Équipier polyvalent du commerce (2019), référentiel Bac Pro Métiers du commerce et de la vente (annexes I), programme d'économie-droit des bacs pro tertiaires, compétences psychosociales (Santé publique France). Vos réglages restent enregistrés dans votre navigateur.</footer>
 </div>
 
 <script>
@@ -410,6 +412,7 @@ const REF = {
     {t:"Collecter et exploiter l'information dans le cadre de la relation client", items:["Assurer la veille informationnelle et commerciale","Traiter et exploiter l'information","Diffuser l'information"]}
   ]},
   mcvA: {label:"MCV option A", long:"Bac Pro Métiers du commerce et de la vente, option A Animation et gestion de l'espace commercial", blocs:["b1","b2","b3","b4A"]},
+  capepc: {label:"CAP EPC", long:"CAP Équipier polyvalent du commerce (référentiel de compétences, 2019)", blocs:["c1","c2","c3"]},
   mcvB: {label:"MCV option B", long:"Bac Pro Métiers du commerce et de la vente, option B Prospection clientèle et valorisation de l'offre commerciale", blocs:["b1","b2","b3","b4B"]},
   eco: {label:"Économie-droit", long:"Programme d'économie-droit des baccalauréats professionnels tertiaires", groups:[
     {t:"Partie 1 — Le contexte économique de l'activité professionnelle", subs:[
@@ -438,6 +441,23 @@ const REF = {
   ]}
 };
 const BLOCS = {
+  c1:{t:"Bloc 1 — Recevoir et suivre les commandes (UP1)", subs:[
+    {t:"Participer à la passation des commandes fournisseurs", items:["Surveiller l'état des stocks","Préparer les propositions de commandes","Utiliser le mode de transmission adapté","Transmettre la commande après validation","Assurer le suivi des commandes"]},
+    {t:"Réceptionner", items:["Identifier les documents de livraison et de traçabilité","Contrôler la qualité et la quantité","Comparer le bon de commande et le bon de livraison","Relever les anomalies éventuelles et les transmettre au responsable","Classer les documents de réception et de traçabilité"]},
+    {t:"Stocker", items:["Utiliser le matériel de manutention adapté","Ranger les produits dans le lieu approprié en réalisant la rotation","Trier et évacuer les contenants","Maintenir l'organisation et la propreté de la réserve"]},
+    {t:"Préparer les commandes destinées aux clients", items:["Prélever et rassembler les produits commandés","Reconditionner et stocker les produits selon leur spécificité","Vérifier l'adéquation entre la commande et la préparation","Enregistrer et entreposer les colis destinés aux clients ou retournés"]}]},
+  c2:{t:"Bloc 2 — Mettre en valeur et approvisionner (UP2)", subs:[
+    {t:"Approvisionner, mettre en rayon et ranger selon la nature des produits", items:["Déterminer les quantités à mettre en rayon","Anticiper les ruptures en rayon","Identifier les produits à mettre en rayon","Acheminer les produits de la réserve vers la surface de vente","Déballer les produits à mettre en rayon","Appliquer les règles de présentation marchande","Effectuer le remplissage des linéaires, réaliser le facing, procéder au réassortiment","Procéder à la rotation des produits","Détecter les produits impropres à la vente et les retirer"]},
+    {t:"Mettre en valeur les produits et l'espace commercial", items:["Participer à la mise en valeur des produits","Participer à l'aménagement de l'espace d'exposition, de vente, des vitrines","Veiller à la propreté et nettoyer les surfaces de vente","Veiller à conserver tous les lieux de vente rangés (cabines, rayons…)"]},
+    {t:"Participer aux opérations de conditionnement des produits", items:["Préparer et nettoyer les équipements et le mobilier","Rassembler le matériel et les fournitures nécessaires au conditionnement","Sélectionner le(s) produit(s) selon les références, les quantités, les prix","Conditionner et / ou emballer le produit","Calculer le prix de vente","Appliquer les règles d'hygiène, de sécurité, de conservation et le protocole de traçabilité"]},
+    {t:"Installer et mettre à jour la signalétique", items:["Éditer des étiquettes prix, produits, étiquettes promotionnelles","Installer et mettre à jour l'ILV et la PLV","Mettre en place et vérifier le balisage","Vérifier l'exactitude de l'affichage et alerter en cas d'anomalies"]},
+    {t:"Lutter contre la démarque et participer aux opérations d'inventaire", items:["Poser les antivols sur les produits","Identifier, repérer et implanter les produits à dates courtes","Repérer et enregistrer la démarque connue","Ranger et compter les produits","Enregistrer le comptage et rendre compte"]}]},
+  c3:{t:"Bloc 3 — Conseiller et accompagner le client dans son parcours d'achat (UP3)", subs:[
+    {t:"Préparer son environnement de travail", items:["Préparer son matériel","Respecter une tenue professionnelle adaptée au contexte et à l'image de l'unité commerciale","Vérifier le bon fonctionnement du matériel et des outils d'aide à la vente"]},
+    {t:"Prendre contact avec le client", items:["Accueillir le client","S'adapter au contexte commercial et au comportement du client","Adopter une attitude d'accueil","Favoriser un climat de confiance"]},
+    {t:"Accompagner le parcours client dans un contexte omnicanal", items:["Adopter une écoute active","Identifier la demande du client, la prendre en compte et / ou la transférer au responsable","Orienter, informer et conseiller le client","Accompagner le client dans l'utilisation des outils digitaux","Présenter le ou les produits","Proposer des services associés et complémentaires","Renseigner le bon de commande, le document de vente et rédiger un message","Remettre les colis, les sacs et les produits réservés aux clients","Réaliser des livraisons"]},
+    {t:"Finaliser la prise en charge du client", items:["Enregistrer les achats et / ou retours","Proposer un moyen de fidélisation","Encaisser et / ou accompagner l'encaissement digital, automatique et / ou mobile","Réaliser les opérations complémentaires à l'encaissement","Prendre congé","Collecter et actualiser l'information sur le client","Fermer la caisse et procéder aux opérations de clôture"]},
+    {t:"Recevoir les réclamations courantes", items:["Écouter et identifier clairement le type de réclamation","Proposer une action corrective dans le cas d'une réclamation simple","Transférer les réclamations non solutionnées au responsable","Expliquer au client la solution proposée"]}]},
   b1:{t:"Bloc 1 — Conseiller et vendre", subs:[
     {t:"Assurer la veille commerciale", items:["Rechercher, hiérarchiser, exploiter et actualiser en continu les informations sur l'entreprise et son marché","Maîtriser la technologie des produits","Sélectionner les outils de recherche d'information les plus adaptés"]},
     {t:"Réaliser la vente dans un cadre omnicanal", items:["Intégrer l'omnicanal dans le processus de vente","Prendre contact avec le client","S'adapter au contexte commercial et au comportement du client","Découvrir, analyser et reformuler les besoins du client, ses motivations et ses freins","Présenter l'entreprise et/ou ses produits et services","Conseiller le client en proposant la solution adaptée","Argumenter et traiter les objections","Réaliser une démonstration le cas échéant","Proposer les produits et/ou services associés","Conclure la vente et prendre congé"]},
@@ -645,7 +665,7 @@ function menu(id, title, body, open=false){
   return `<details class="menu" id="m-${id}"${open?" open":""}><summary>${esc(title)}<span class="count" data-count="${id}"></span></summary><div class="menu-body">${body}</div></details>`;
 }
 function buildRefs(){
-  $("#refpick").innerHTML = Object.entries(REF).map(([k,r])=>`<label class="chip big"><input type="checkbox" name="ref" id="ref-${k}" value="${k}"><span>${esc(r.label)}<small>${esc(k==="seconde"?"Vademecum 2019":k==="eco"?"Programme commun tertiaire":k==="mcvA"?"Blocs 1, 2, 3 et 4A":"Blocs 1, 2, 3 et 4B")}</small></span></label>`).join("");
+  $("#refpick").innerHTML = Object.entries(REF).map(([k,r])=>`<label class="chip big"><input type="checkbox" name="ref" id="ref-${k}" value="${k}"><span>${esc(r.label)}<small>${esc(k==="seconde"?"Vademecum 2019":k==="eco"?"Programme commun tertiaire":k==="mcvA"?"Blocs 1, 2, 3 et 4A":k==="capepc"?"Blocs 1, 2 et 3 (UP1 à UP3)":"Blocs 1, 2, 3 et 4B")}</small></span></label>`).join("");
   let h = "";
   for(const [k,r] of Object.entries(REF)){
     let inner = "";
@@ -677,7 +697,7 @@ let palDoc = 0;
 
 // ---------- Ressources déposées ----------
 const RES = [];
-const ROLES = ["Cours","Article de presse","Document d'entreprise","Exercice ou évaluation existant","Texte juridique","Données chiffrées","Autre"];
+const ROLES = ["Référentiel ou programme officiel","Cours","Article de presse","Document d'entreprise","Exercice ou évaluation existant","Texte juridique","Données chiffrées","Autre"];
 const MAX_PER = 15000, MAX_ALL = 45000;
 const LIBS = {
   pdf:["https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js","https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"],
@@ -726,6 +746,7 @@ async function extract(file){
 const fmtSize = n => n<1024 ? n+" o" : n<1048576 ? Math.round(n/1024)+" Ko" : (n/1048576).toFixed(1)+" Mo";
 function guessRole(name){
   const n = name.toLowerCase();
+  if(/r[ée]f[ée]rentiel|programme|vade-?m[ée]cum|annexe/.test(n)) return "Référentiel ou programme officiel";
   if(/cours|synth|le[çc]on|fiche/.test(n)) return "Cours";
   if(/article|presse|journal/.test(n)) return "Article de presse";
   if(/exo|exercice|eval|devoir|td|quiz/.test(n)) return "Exercice ou évaluation existant";
@@ -783,9 +804,20 @@ $("#btn-paste").addEventListener("click", ()=>{
 function resourcesSection(p){
   const ready = RES.filter(r=>r.status!=="loading");
   if(!ready.length) return;
-  p("## Ressources de référence");
-  p(`**Consigne d'utilisation** : ${val("resUse")}.`);
-  p("Rattache chaque activité à la ressource utilisée (« d'après Ressource 1 »). Si une ressource contredit le référentiel ou le droit en vigueur, signale-le en une ligne et suis le référentiel.");
+  const type = checked("type")[0];
+  const quoi = type ? articleType(type) : "la ressource demandée";
+  const use = val("resUse");
+  const contenu = ready.filter(r=>!/^Référentiel/.test(r.role));
+  const refDocs = ready.filter(r=>/^Référentiel/.test(r.role));
+  p("## Ressources de référence (base obligatoire de ta production)");
+  p(`**Consigne d'utilisation** : ${use}.`);
+  if(contenu.length){
+    if(/^Inspiration/.test(use)) p(`Construis ${quoi} en reprenant le niveau, le style, le type d'exemples et le vocabulaire des ressources ci-dessous.`);
+    else p(`Construis ${quoi} **à partir des ressources ci-dessous** : les notions, définitions, exemples, situations, chiffres et vocabulaire viennent d'abord de ces documents, pas de tes connaissances générales.${/^Source unique/.test(use)?" N'ajoute aucun contenu qui n'y figure pas : s'il manque quelque chose, signale-le au lieu de l'inventer.":" Tout complément qui ne vient pas des ressources est signalé « (complément) » dans la fiche enseignant."}`);
+    p("Avant de produire, écris en 3 à 5 puces ce que tu retiens de chaque ressource et comment tu l'utilises. Rattache ensuite chaque activité à sa ressource (« d'après Ressource 1 »).");
+  }
+  if(refDocs.length) p(`Le ou les documents marqués « référentiel ou programme officiel » priment : reprends leurs compétences, savoirs associés et critères d'évaluation avec leur formulation exacte, plutôt qu'une version résumée.`);
+  p("Si une ressource contredit le référentiel ou le droit en vigueur, signale-le en une ligne et suis le référentiel.");
   p("");
   let budget = MAX_ALL;
   ready.forEach((r,i)=>{
@@ -825,7 +857,7 @@ function generate(){
   const T = TYPES.find(t=>t.id===type);
   const meths = checked("meth");
   const grilles = checked("grille");
-  const theme = val("theme") || "[précisez la notion]";
+  const theme = val("theme") || (RES.length ? "celle des ressources de référence déposées ci-dessous" : "[précisez la notion]");
   const L = [];
   const p = s => L.push(s);
 
@@ -840,6 +872,7 @@ function generate(){
   p(`- **Durée** : ${val("duree")}`);
   p(`- **Degré de difficulté de départ** : ${val("difficulte")}`);
   if(val("entreprise")) p(`- **Contexte professionnel fil rouge** : ${val("entreprise")} — toutes les situations s'y rattachent`);
+  if(/CAP/.test(val("niveau"))) p("- **Public de CAP** : consignes très courtes, une seule action par consigne, vocabulaire professionnel expliqué, situations concrètes du magasin (réserve, rayon, caisse, retrait de colis)");
   p(`- **Ton employé avec les élèves** : ${val("ton").toLowerCase()}, vouvoiement ou tutoiement cohérent du début à la fin`);
   p("");
   resourcesSection(p);
@@ -1008,8 +1041,8 @@ function generate(){
   p("## Avant de répondre, vérifie que");
   p("- tout le contenu juridique et économique est exact et à jour (droit français en vigueur) ;");
   p("- chaque activité est reliée à une compétence citée plus haut ;");
-  if(RES.length) p("- le contenu respecte les ressources de référence fournies, selon la consigne d'utilisation ;");
-  p("- le vocabulaire est accessible à des élèves de lycée professionnel ;");
+  if(RES.length) p("- le contenu vient bien des ressources de référence fournies, selon la consigne d'utilisation, et chaque activité indique sa ressource ;");
+  p(/CAP/.test(val("niveau")) ? "- le vocabulaire et les consignes sont adaptés à des élèves de CAP (phrases courtes, une action par consigne, mots professionnels expliqués) ;" : "- le vocabulaire est accessible à des élèves de lycée professionnel ;");
   p("- la durée annoncée est réaliste ;");
   if($("#diffOn").checked) p("- chaque activité existe bien dans tous les degrés annoncés, avec ses coups de pouce et son « Pour aller plus loin » ;");
   if(T && (T.doc || T.inter)) p("- seules les couleurs imposées sont utilisées et la mise en page ne ressemble pas à une réponse de discussion.");
@@ -1180,7 +1213,7 @@ function syncUI(){
   document.querySelectorAll("#f > fieldset.step").forEach(fs=>{ if(!fs.hidden){ const b = fs.querySelector("legend b"); if(b) b.textContent = ++num; } });
   const warn = [];
   if(!type) warn.push("choisissez ce que vous voulez créer (étape 3)");
-  if(!val("theme")) warn.push("précisez la notion travaillée (étape 4)");
+  if(!val("theme") && !RES.length) warn.push("précisez la notion travaillée (étape 4)");
   $("#warn").textContent = warn.length ? "À compléter : " + warn.join(" · ") : "";
   $("#warn").hidden = !warn.length;
   const md = generate();
@@ -1258,6 +1291,7 @@ function loadExample(){
 $("#f").addEventListener("input", e=>{
   const t = e.target;
   if(t.dataset.all){ document.querySelectorAll(`input.comp[data-grp="${t.dataset.all}"]`).forEach(i=>i.checked=t.checked); }
+  if(t.id==="niveau" && /CAP/.test(t.value)){ const c = $("#ref-capepc"); if(c && !c.checked){ c.checked = true; const first = document.querySelector("#rb-capepc details"); if(first) first.open = true; } ["seconde","mcvA","mcvB","eco"].forEach(k=>{ const r = $("#ref-"+k); if(r) r.checked = false; }); }
   if(t.name==="ref" && t.checked){ const first = document.querySelector(`#rb-${t.value} details`); if(first) first.open = true; }
   syncUI();
 });
